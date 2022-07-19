@@ -15,7 +15,7 @@ export class PullRequests extends GithubExtractor {
                       hasNextPage
                       hasPreviousPage
                     }
-                 nodes {
+                 nodes {        
                     isDraft
                     author {
                           login
@@ -59,18 +59,19 @@ export class PullRequests extends GithubExtractor {
     }
 
     protected paginate(data: any) {
-        return data.pullRequests?.pageInfo?.hasNextPage
+        return data.pullRequests?.pageInfo?.hasPreviousPage
     }
 
     protected getNextQuery(data: any): string {
-        const endCursor = data.pullRequests.pageInfo.endCursor;
+        const startCursor = data.pullRequests.pageInfo.startCursor;
         return this.getQuery()
-            .replace('pullRequests(last:100, states:OPEN)', `pullRequests(last:100, states:OPEN, after: "${endCursor}")`)
+            .replace('pullRequests(last:100, states:OPEN)', `pullRequests(last:100, states:OPEN, before: "${startCursor}")`)
     }
 
-    protected aggregateData(data: any, nextData: any) {
+    protected aggregateData(data: any, nextData: any): boolean {
         data.pullRequests.pageInfo = nextData.pullRequests.pageInfo;
         data.pullRequests.nodes.push(...nextData.pullRequests.nodes);
+        return true;
     };
 
     protected parseData(data: any): GithubData[] {

@@ -39,13 +39,14 @@ export class Issues extends GithubExtractor {
     }
 
     protected paginate(data: any) {
-        return data.issues?.pageInfo?.hasNextPage
+        return data.issues?.pageInfo?.hasPreviousPage
+            && (new Date(data.issues.nodes[0].createdAt) > this.stopExtractionDate)
     }
 
     protected getNextQuery(data: any): string {
-        const endCursor = data.issues.pageInfo.endCursor;
+        const startCursor = data.issues.pageInfo.startCursor;
         return this.getQuery()
-            .replace('issues(last:100)', `issues(last:100, after: "${endCursor}")`)
+            .replace('issues(last:100)', `issues(last:100, before: "${startCursor}")`)
     }
 
     protected aggregateData(data: any, nextData: any) {

@@ -12,7 +12,6 @@ function createInstance<T extends GithubExtractor>(constructor: new (token) => T
 
 function extractToken() {
     let token;
-
      if(process.env.RENOVATE_KPI_TOKEN){
          token = `token ${process.env.RENOVATE_KPI_TOKEN}`
      }

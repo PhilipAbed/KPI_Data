@@ -39,7 +39,8 @@ export class Discussions extends GithubExtractor {
     }
 
     protected paginate(data: any) {
-        return data.discussions?.pageInfo?.hasNextPage
+        return data.discussions?.pageInfo?.hasNextPage &&
+            (new Date(data.discussions.nodes[data.discussions.nodes.length-1].updatedAt) > this.stopExtractionDate)
     }
 
     protected getNextQuery(data: any): string {
@@ -72,7 +73,6 @@ export class Discussions extends GithubExtractor {
             if(dis.author?.login) {
                 discussion.author = dis.author.login;
             }
-
 
             if (dis.answer?.author) {
                 discussion.answerAuthor = dis.answer.author.login;
