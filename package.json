@@ -1,0 +1,18 @@
+{
+  "name": "KPI_RenovateCommunity",
+  "version": "1.0.0",
+  "description": "renovate SLA community statistics",
+  "main": "app.js",
+  "author": "PhilipAbed",
+  "license": "MIT",
+  "scripts": {
+    "start": "node -r ts-node/register/transpile-only -- app.ts",
+    "debug": "node --inspect-brk -r ts-node/register/transpile-only  -- app.ts"
+  },
+  "dependencies": {
+    "@octokit/graphql": "^5.0.0",
+    "github-graphql-schema": "^10.94.0",
+    "graphql": "^16.5.0",
+    "typescript": "^4.7.4"
+  }
+}
