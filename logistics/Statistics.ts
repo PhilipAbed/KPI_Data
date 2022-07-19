@@ -40,11 +40,10 @@ export function responseTimes(issues: Issue[], discussions: Discussion[], prs: P
 /*
 
 Community Responsiveness (North Star) - The average amount of time taken to respond to the community.
-  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx OSS PRs - Acknowledge newly created PRs to the OSS repo.
-  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxIssues / Discussions - Response time to GitHub Issues and Discussions created in the OSS repo.
+  OSS PRs - Acknowledge newly created PRs to the OSS repo.
+  Issues / Discussions - Response time to GitHub Issues and Discussions created in the OSS repo.
 Community Health
   Number of OSS Contributors - The number of contributors to the OSS repository.
   Number of Contributor PRs Opened - The number of PRs opened by contributors to the OSS repo.
   Number of GitHub Issues / Discussions Opened - The number of Issues / Discussions created by the OSS community.
-
  */

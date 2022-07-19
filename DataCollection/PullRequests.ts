@@ -8,6 +8,13 @@ export class PullRequests extends GithubExtractor {
         {
            repository(owner:"renovatebot", name: "renovate") {
               pullRequests(last:100, states:OPEN) {
+                 totalCount 
+                    pageInfo {
+                      startCursor
+                      endCursor
+                      hasNextPage
+                      hasPreviousPage
+                    }
                  nodes {
                     isDraft
                     author {
@@ -50,6 +57,21 @@ export class PullRequests extends GithubExtractor {
         }
   `;
     }
+
+    protected paginate(data: any) {
+        return data.pullRequests?.pageInfo?.hasNextPage
+    }
+
+    protected getNextQuery(data: any): string {
+        const endCursor = data.pullRequests.pageInfo.endCursor;
+        return this.getQuery()
+            .replace('pullRequests(last:100, states:OPEN)', `pullRequests(last:100, states:OPEN, after: "${endCursor}")`)
+    }
+
+    protected aggregateData(data: any, nextData: any) {
+        data.pullRequests.pageInfo = nextData.pullRequests.pageInfo;
+        data.pullRequests.nodes.push(...nextData.pullRequests.nodes);
+    };
 
     protected parseData(data: any): GithubData[] {
         let prsInfos: PrInfo[] = [];

@@ -1,5 +1,5 @@
 {
-  "name": "KPI_RenovateCommunity",
+  "name": "Kpi_RenovateCommunity",
   "version": "1.0.0",
   "description": "renovate SLA community statistics",
   "main": "app.js",
@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@octokit/graphql": "^5.0.0",
+    "@types/node": "^18.0.6",
     "github-graphql-schema": "^10.94.0",
     "graphql": "^16.5.0",
     "typescript": "^4.7.4"

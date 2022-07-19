@@ -38,6 +38,21 @@ export class Issues extends GithubExtractor {
   `;
     }
 
+    protected paginate(data: any) {
+        return data.issues?.pageInfo?.hasNextPage
+    }
+
+    protected getNextQuery(data: any): string {
+        const endCursor = data.issues.pageInfo.endCursor;
+        return this.getQuery()
+            .replace('issues(last:100)', `issues(last:100, after: "${endCursor}")`)
+    }
+
+    protected aggregateData(data: any, nextData: any) {
+        data.issues.pageInfo = nextData.issues.pageInfo;
+        data.issues.nodes.push(...nextData.issues.nodes);
+    };
+
     protected parseData(data: any): GithubData[] {
         let issuesInfo: Issue[] = [];
         if (!data || data.issues?.nodes?.length <= 0) {
