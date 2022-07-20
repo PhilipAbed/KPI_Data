@@ -1,13 +1,67 @@
 import {Comment, GithubData, PrInfo, Review, ReviewState} from "./types";
-import {GithubExtractor} from "./GithubExtractor";
+import {GithubExtractor, stopExtractionDate} from "./GithubExtractor";
 
 export class PullRequests extends GithubExtractor {
 
-    protected getQuery(): string {
+  /*  protected getQuery(): string {
         return `
         {
            repository(owner:"renovatebot", name: "renovate") {
               pullRequests(last:100, states:OPEN) {
+                 totalCount
+                    pageInfo {
+                      startCursor
+                      endCursor
+                      hasNextPage
+                      hasPreviousPage
+                    }
+                 nodes {
+                    isDraft
+                    author {
+                          login
+                    }
+                    participants(first:10) {
+                             nodes {
+                                     login
+                             }
+                    }
+                    commits(last:1){
+                      nodes {
+                        commit {
+                          pushedDate
+                        }
+                      }
+                    }
+                    comments(last:100){
+                      nodes{
+                        author{ login}
+                        createdAt
+                      }
+                    }
+                    number
+                    title
+                    createdAt
+                    updatedAt
+                    reviews(last:100) {
+                        nodes {
+                           author {
+                              login
+                           }
+                           state
+                           submittedAt
+                        }
+                    }
+                 }
+              }
+           }
+        }
+  `;
+    }*/
+    protected getQuery(): string {
+        return `
+        {
+           repository(owner:"renovatebot", name: "renovate") {
+              pullRequests(last:100) {
                  totalCount 
                     pageInfo {
                       startCursor
@@ -15,8 +69,9 @@ export class PullRequests extends GithubExtractor {
                       hasNextPage
                       hasPreviousPage
                     }
-                 nodes {        
+                 nodes {       
                     isDraft
+                    state
                     author {
                           login
                     }
@@ -59,13 +114,14 @@ export class PullRequests extends GithubExtractor {
     }
 
     protected paginate(data: any) {
-        return data.pullRequests?.pageInfo?.hasPreviousPage
+        return data.pullRequests?.pageInfo?.hasPreviousPage &&
+            (new Date(data.pullRequests.nodes[0].createdAt) > stopExtractionDate)
     }
 
     protected getNextQuery(data: any): string {
         const startCursor = data.pullRequests.pageInfo.startCursor;
         return this.getQuery()
-            .replace('pullRequests(last:100, states:OPEN)', `pullRequests(last:100, states:OPEN, before: "${startCursor}")`)
+            .replace('pullRequests(last:100)', `pullRequests(last:100, before: "${startCursor}")`)
     }
 
     protected aggregateData(data: any, nextData: any): boolean {
@@ -85,9 +141,12 @@ export class PullRequests extends GithubExtractor {
                 number: pr.number,
                 createdAt: new Date(pr.createdAt),
                 updatedAt: new Date(pr.updatedAt),
-                author: pr.author,
+                author: pr.author.login,
                 isDraft: pr.isDraft
             };
+            if(pr.state){
+                prInfo.state = pr.state;
+            }
             if (pr.reviews?.nodes?.length > 0) {
                 prInfo.reviewsAndComments = [];
                 for (const revObj of pr.reviews.nodes) {

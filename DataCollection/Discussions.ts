@@ -1,5 +1,5 @@
 import {Comment, Discussion, GithubData} from "./types";
-import {GithubExtractor} from "./GithubExtractor";
+import {GithubExtractor, stopExtractionDate} from "./GithubExtractor";
 
 export class Discussions extends GithubExtractor {
 
@@ -40,7 +40,7 @@ export class Discussions extends GithubExtractor {
 
     protected paginate(data: any) {
         return data.discussions?.pageInfo?.hasNextPage &&
-            (new Date(data.discussions.nodes[data.discussions.nodes.length-1].updatedAt) > this.stopExtractionDate)
+            (new Date(data.discussions.nodes[data.discussions.nodes.length-1].updatedAt) > stopExtractionDate)
     }
 
     protected getNextQuery(data: any): string {

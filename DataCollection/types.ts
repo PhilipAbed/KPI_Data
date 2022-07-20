@@ -30,6 +30,7 @@ export interface PrInfo extends GithubData {
     reviewsAndComments?: Review[];
     participants?: string[];
     lastCommitDate?: Date;
+    state?: string;
 }
 export interface Issue extends GithubData{
     labels?: string[];
