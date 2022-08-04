@@ -81,7 +81,7 @@ export class Discussions extends GithubExtractor {
             if (dis.comments?.nodes?.length > 0) {
                 discussion.comments = [];
                 for (const comment of dis.comments.nodes) {
-                    const cmt: Comment = {author: comment.author.login, submittedAt: comment.createdAt}
+                    const cmt: Comment = {author: comment.author.login, submittedAt: new Date(comment.createdAt)}
                     discussion.comments.push(cmt);
                 }
             }

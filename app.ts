@@ -3,7 +3,7 @@ import {Issues} from "./DataCollection/Issues";
 import {PullRequests} from "./DataCollection/PullRequests";
 import {GithubExtractor} from "./DataCollection/GithubExtractor";
 import {PrInfo, Issue, Discussion} from "./DataCollection/types";
-import {responseTimes} from "./logistics/Statistics";
+import {calculateStatistics} from "./logistics/Statistics";
 
 main()
 
@@ -34,7 +34,7 @@ export async function main() {
     const discussions = await createInstance(Discussions, token).getApiData() as Discussion[];
     const issues = await createInstance(Issues, token).getApiData() as Issue[];
     const pullRequests = await createInstance(PullRequests, token).getApiData() as PrInfo[];
-    await responseTimes(issues, discussions, pullRequests);
+    await calculateStatistics(issues, discussions, pullRequests);
 }
 
 

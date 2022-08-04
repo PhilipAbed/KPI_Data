@@ -76,7 +76,7 @@ export class Issues extends GithubExtractor {
             if (is.comments?.nodes?.length > 0) {
                 issue.comments = [];
                 for (const comment of is.comments.nodes) {
-                    const cmt: Comment = {author: comment.author.login, submittedAt: comment.createdAt}
+                    const cmt: Comment = {author: comment.author.login, submittedAt: new Date(comment.createdAt)}
                     issue.comments.push(cmt);
                 }
             }
