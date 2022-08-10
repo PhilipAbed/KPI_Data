@@ -6,14 +6,15 @@
   "author": "PhilipAbed",
   "license": "MIT",
   "scripts": {
-    "start": "node -r ts-node/register/transpile-only -- app.ts",
-    "debug": "node --inspect-brk -r ts-node/register/transpile-only  -- app.ts"
+    "start": "node -r ts-node/register/transpile-only -- lib/app.ts",
+    "debug": "node --inspect-brk -r ts-node/register/transpile-only  -- lib/app.ts"
   },
   "dependencies": {
     "@octokit/graphql": "^5.0.0",
     "@types/node": "^18.0.6",
     "github-graphql-schema": "^10.94.0",
     "graphql": "^16.5.0",
+    "mysql": "^2.18.1",
     "typescript": "^4.7.4"
   }
 }
