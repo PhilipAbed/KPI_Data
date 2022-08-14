@@ -16,13 +16,13 @@ export class IssueTable implements IgithubDB {
     public async update() {
         const sqlRes = await this.selectTable();
         let table;
-        if(sqlRes && sqlRes.length>0){
+        if (sqlRes && sqlRes.length > 0) {
             table = sqlRes[0];
         } else {
             return;
         }
 
-        if(!table) {
+        if (!table) {
             console.log('table is empty, insert all Issues');
             await this.insertRows(this.issues);
             return;
@@ -41,7 +41,7 @@ export class IssueTable implements IgithubDB {
     }
 
     async insertRows(issues: Issue[]) {
-        if(!issues.length){
+        if (!issues.length) {
             return;
         }
         let sql = `INSERT INTO issue VALUES `;
@@ -67,13 +67,13 @@ export class IssueTable implements IgithubDB {
         for (const iss of issues) {
             const issRow = this.convertToObj(iss);
             let row = map[iss.number];
-            if (row && isEqual(row,issRow)) {
+            if (row && isEqual(row, issRow)) {
                 await this.updateRow(row.id, iss);
             }
         }
     }
 
-    convertToArr(iss: Issue) : any {
+    convertToArr(iss: Issue): any {
         return [
             iss.number,
             iss.title.replace(/\"/g, "'"),
@@ -89,7 +89,7 @@ export class IssueTable implements IgithubDB {
         ];
     }
 
-    convertToObj(iss: Issue) : any {
+    convertToObj(iss: Issue): any {
         return {
             id: iss.number,
             title: iss.title.replace(/\"/g, "'"),

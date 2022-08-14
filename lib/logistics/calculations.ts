@@ -117,7 +117,7 @@ export function calculateIssues(issues: Issue[], listOfPaidAuthors: string[], st
     return relevantIssues;
 }
 
-export function calculateDiscussions(discussions: Discussion[],  listOfPaidAuthors: string[], stats: Stats) {
+export function calculateDiscussions(discussions: Discussion[], listOfPaidAuthors: string[], stats: Stats) {
     let checkedDiscussions = [];
     let pendingDiscussions = [];
 

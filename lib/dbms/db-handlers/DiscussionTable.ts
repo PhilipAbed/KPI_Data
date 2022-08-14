@@ -1,4 +1,3 @@
-
 import {Discussion} from "../../data-collection/types";
 import {IgithubDB} from "../interfaces/IgithubDB";
 import {Idbconnection} from "../interfaces/Idbconnection";
@@ -16,14 +15,14 @@ export class DiscussionTable implements IgithubDB {
     public async update() {
         const sqlRes = await this.selectTable();
         let table;
-        if(sqlRes && sqlRes.length>0){
+        if (sqlRes && sqlRes.length > 0) {
             table = sqlRes[0];
         } else {
             console.log('unable to connect');
             return;
         }
 
-        if(!table) {
+        if (!table) {
             console.log('table is empty, insert all discussions');
             await this.insertRows(this.discussions);
             return;
@@ -44,7 +43,7 @@ export class DiscussionTable implements IgithubDB {
     }
 
     async insertRows(discussions: Discussion[]) {
-        if(!discussions.length){
+        if (!discussions.length) {
             return;
         }
         let sql = `INSERT INTO discussion VALUES `;
@@ -57,7 +56,7 @@ export class DiscussionTable implements IgithubDB {
         sql = sql.concat(values.substring(0, values.length - 1));
         try {
             await this.conn.exec(sql);
-        } catch (err){
+        } catch (err) {
             console.log(err);
         }
     }
@@ -81,7 +80,7 @@ export class DiscussionTable implements IgithubDB {
         }
     }
 
-    convertToArr(dis: Discussion) : any {
+    convertToArr(dis: Discussion): any {
         return [
             dis.number,
             dis.title.replace(/\"/g, "'"),
@@ -96,7 +95,7 @@ export class DiscussionTable implements IgithubDB {
         ];
     }
 
-    convertToObj(dis: Discussion) : any {
+    convertToObj(dis: Discussion): any {
         return {
             id: dis.number,
             title: dis.title.replace(/\"/g, "'"),

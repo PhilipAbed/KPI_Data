@@ -6,20 +6,21 @@
   "author": "PhilipAbed",
   "license": "MIT",
   "scripts": {
+    "build": "run-s clean generate:* compile:*",
     "start": "node -r ts-node/register/transpile-only -- lib/app.ts",
     "debug": "node --inspect-brk -r ts-node/register/transpile-only  -- lib/app.ts"
   },
   "dependencies": {
     "@octokit/graphql": "^5.0.0",
-    "@types/node": "^18.0.6",
     "github-graphql-schema": "^10.94.0",
-    "graphql": "^16.5.0",
-    "lodash-es": "^4.17.21",
     "lodash.isequal": "^4.5.0",
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3",
     "sqlite": "^4.1.2",
-    "sqlite3": "^5.0.11",
-    "typescript": "^4.7.4"
+    "sqlite3": "^5.0.11"
+  },
+  "devDependencies": {
+    "typescript": "^4.7.4",
+    "@types/node": "^18.0.6"
   }
 }

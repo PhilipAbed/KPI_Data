@@ -48,7 +48,7 @@ export async function main() {
     const relevantPrs = calculatePrs(pullRequests, listOfPaidAuthors, stats);
 
     let dbconn: Idbconnection;
-    if(process.env.KPI_SQLITE_DB_FILE) {
+    if (process.env.KPI_SQLITE_DB_FILE) {
         dbconn = new SqlLite();
     } else {
         dbconn = new MysqlConnection();

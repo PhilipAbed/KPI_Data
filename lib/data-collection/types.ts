@@ -7,7 +7,7 @@ export const enum ReviewState {
     PR_COMMENT = 'PR_COMMENT',
 }
 
-export interface Review extends Comment{
+export interface Review extends Comment {
     state: ReviewState;
 }
 
@@ -37,12 +37,13 @@ export interface PrInfo extends GithubData {
     state?: string;
     requiresReview?: number[];
 }
-export interface Issue extends GithubData{
+
+export interface Issue extends GithubData {
     labels?: string[];
     state?: string;
 }
 
-export interface Discussion extends GithubData{
+export interface Discussion extends GithubData {
     answerAuthor?: string;
     answerChosenAt?: Date;
 }

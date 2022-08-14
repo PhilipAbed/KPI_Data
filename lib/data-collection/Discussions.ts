@@ -40,7 +40,7 @@ export class Discussions extends GithubExtractor {
 
     protected paginate(data: any) {
         return data.discussions?.pageInfo?.hasNextPage &&
-            (new Date(data.discussions.nodes[data.discussions.nodes.length-1].updatedAt) > stopExtractionDate)
+            (new Date(data.discussions.nodes[data.discussions.nodes.length - 1].updatedAt) > stopExtractionDate)
     }
 
     protected getNextQuery(data: any): string {

@@ -11,8 +11,8 @@ export function firstAndLastComments(data: GithubData, comments: Comment[]) {
         }
     }
 
-    if(comments.length> 1 && comments[comments.length-1]){
-        const lastComment = comments[comments.length-1];
+    if (comments.length > 1 && comments[comments.length - 1]) {
+        const lastComment = comments[comments.length - 1];
         data.lastCommentDate = lastComment.submittedAt;
         data.lastCommentDateAuthor = lastComment.author;
     }

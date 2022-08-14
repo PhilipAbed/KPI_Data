@@ -3,60 +3,60 @@ import {GithubExtractor, stopExtractionDate} from "./GithubExtractor";
 
 export class PullRequests extends GithubExtractor {
 
-  /*  protected getQuery(): string {
-        return `
-        {
-           repository(owner:"renovatebot", name: "renovate") {
-              pullRequests(last:100) {
-                 totalCount
-                    pageInfo {
-                      startCursor
-                      endCursor
-                      hasNextPage
-                      hasPreviousPage
-                    }
-                 nodes {
-                    isDraft
-                    author {
-                          login
-                    }
-                    participants(first:10) {
-                             nodes {
-                                     login
-                             }
-                    }
-                    commits(last:1){
-                      nodes {
-                        commit {
-                          pushedDate
-                        }
+    /*  protected getQuery(): string {
+          return `
+          {
+             repository(owner:"renovatebot", name: "renovate") {
+                pullRequests(last:100) {
+                   totalCount
+                      pageInfo {
+                        startCursor
+                        endCursor
+                        hasNextPage
+                        hasPreviousPage
                       }
-                    }
-                    comments(last:100){
-                      nodes{
-                        author{ login}
-                        createdAt
+                   nodes {
+                      isDraft
+                      author {
+                            login
                       }
-                    }
-                    number
-                    title
-                    createdAt
-                    updatedAt
-                    reviews(last:100) {
+                      participants(first:10) {
+                               nodes {
+                                       login
+                               }
+                      }
+                      commits(last:1){
                         nodes {
-                           author {
-                              login
-                           }
-                           state
-                           submittedAt
+                          commit {
+                            pushedDate
+                          }
                         }
-                    }
-                 }
-              }
-           }
-        }
-  `;
-    }*/
+                      }
+                      comments(last:100){
+                        nodes{
+                          author{ login}
+                          createdAt
+                        }
+                      }
+                      number
+                      title
+                      createdAt
+                      updatedAt
+                      reviews(last:100) {
+                          nodes {
+                             author {
+                                login
+                             }
+                             state
+                             submittedAt
+                          }
+                      }
+                   }
+                }
+             }
+          }
+    `;
+      }*/
     protected getQuery(): string {
         return `
         {
@@ -146,7 +146,7 @@ export class PullRequests extends GithubExtractor {
                 isDraft: pr.isDraft,
             };
             prInfo.reviewsAndComments = [];
-            if(pr.state){
+            if (pr.state) {
                 prInfo.state = pr.state;
             }
             if (pr.reviews?.nodes?.length > 0) {

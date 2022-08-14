@@ -1,5 +1,7 @@
 export interface Idbconnection {
     connectToDB();
+
     close();
-    exec(query:string);
+
+    exec(query: string);
 }
