@@ -61,12 +61,13 @@ export class Issues extends GithubExtractor {
             return issuesInfo;
         }
         for (const is of data.issues.nodes) {
+            const author = is.author ? is.author.login : '';
             let issue: Issue = {
                 title: is.title,
                 number: is.number,
                 createdAt: new Date(is.createdAt),
                 updatedAt: new Date(is.updatedAt),
-                author: is.author.login,
+                author: author,
                 state: is.state,
             };
             if (is.labels?.nodes?.length > 0) {
@@ -78,7 +79,8 @@ export class Issues extends GithubExtractor {
             if (is.comments?.nodes?.length > 0) {
                 issue.comments = [];
                 for (const comment of is.comments.nodes) {
-                    const cmt: Comment = {author: comment.author.login, submittedAt: new Date(comment.createdAt)}
+                    const authorName = comment.author?.login ?? '';
+                    const cmt: Comment = {author: authorName, submittedAt: new Date(comment.createdAt)}
                     issue.comments.push(cmt);
                 }
             }

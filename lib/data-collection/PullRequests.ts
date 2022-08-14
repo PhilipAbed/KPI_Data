@@ -7,7 +7,7 @@ export class PullRequests extends GithubExtractor {
         return `
         {
            repository(owner:"renovatebot", name: "renovate") {
-              pullRequests(last:100, states:OPEN) {
+              pullRequests(last:100) {
                  totalCount
                     pageInfo {
                       startCursor
@@ -136,13 +136,14 @@ export class PullRequests extends GithubExtractor {
             return prsInfos;
         }
         for (const pr of data.pullRequests.nodes) {
+            const author = pr.author ? pr.author.login : '';
             let prInfo: PrInfo = {
                 title: pr.title,
                 number: pr.number,
                 createdAt: new Date(pr.createdAt),
                 updatedAt: new Date(pr.updatedAt),
-                author: pr.author.login,
-                isDraft: pr.isDraft
+                author: author,
+                isDraft: pr.isDraft,
             };
             prInfo.reviewsAndComments = [];
             if(pr.state){
@@ -150,8 +151,9 @@ export class PullRequests extends GithubExtractor {
             }
             if (pr.reviews?.nodes?.length > 0) {
                 for (const revObj of pr.reviews.nodes) {
+                    const authorName = revObj.author?.login ?? '';
                     const review: Review = {
-                        author: revObj.author.login,
+                        author: authorName,
                         state: revObj.state,
                         submittedAt: new Date(revObj.submittedAt)
                     }
@@ -167,13 +169,15 @@ export class PullRequests extends GithubExtractor {
             if (pr.comments?.nodes?.length > 0) {
                 prInfo.comments = [];
                 for (const comment of pr.comments.nodes) {
+                    const authorNameReviewComment = comment.author?.login ?? '';
                     const review: Review = {
-                        author: comment.author.login,
+                        author: authorNameReviewComment,
                         state: ReviewState.PR_COMMENT,
                         submittedAt: new Date(comment.createdAt)
                     }
                     prInfo.reviewsAndComments.push(review);
-                    const cmt: Comment = {author: comment.author.login, submittedAt: new Date(comment.createdAt)}
+                    const authorName = comment.author?.login ?? '';
+                    const cmt: Comment = {author: authorName, submittedAt: new Date(comment.createdAt)}
                     prInfo.comments.push(cmt);
                 }
                 prInfo.reviewsAndComments = prInfo.reviewsAndComments.sort(

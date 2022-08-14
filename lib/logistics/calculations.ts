@@ -1,6 +1,6 @@
-import {Discussion, Issue, PrInfo} from "../data-collection/types";
+import {Discussion, Issue, PrInfo, Stats} from "../data-collection/types";
 import {stopExtractionDate} from "../data-collection/GithubExtractor";
-import {firstAndLastComments, Stats} from "./util";
+import {firstAndLastComments} from "./util";
 
 
 export function calculatePrs(prs: PrInfo[], listOfPaidAuthors: string[], stats: Stats) {
@@ -10,12 +10,19 @@ export function calculatePrs(prs: PrInfo[], listOfPaidAuthors: string[], stats: 
     let prsOpenedByOssContributors = [];
     let waitingDaysArrPR = [];
     let ossPrAuthors = [];
+    let openNonDraftPrs = [];
 
-    console.log("maintainers list: " + listOfPaidAuthors);
+    let relevantPRs: PrInfo[] = [];
     prs.forEach(pr => {
         if (new Date(pr.createdAt) < stopExtractionDate) {
             return;
         }
+        pr.requiresReview = [];
+        if (pr.state === 'OPEN' && !pr.isDraft) {
+            openNonDraftPrs.push(pr.number);
+            pr.requiresReview.push(pr.number);
+        }
+
         let acknowledgementDays = undefined;
         if (pr.reviewsAndComments) {
             acknowledgementDays = firstAndLastComments(pr, pr.reviewsAndComments);
@@ -31,6 +38,7 @@ export function calculatePrs(prs: PrInfo[], listOfPaidAuthors: string[], stats: 
             // waitingDaysArrPR.push(Math.abs(new Date().getDate() - pr.createdAt.getDate()));
         }
 
+        relevantPRs.push(pr);
         if (!pr.author) {
             return;
         }
@@ -51,7 +59,9 @@ export function calculatePrs(prs: PrInfo[], listOfPaidAuthors: string[], stats: 
     stats.prAverageTimeResponse = sumWaitingTimePrs / waitingDaysArrPR.length;
     stats.numberOfOpenedPrsByMaintainers = prsOpenedByMaintainers.length;
     stats.numberOfOpenedPrsByCommunity = prsOpenedByOssContributors.length;
-    stats.pendingPrs = JSON.stringify(pendingPrs);
+    stats.pendingNewPrs = JSON.stringify(pendingPrs);
+    stats.prsRequireAttention = JSON.stringify(openNonDraftPrs);
+    return relevantPRs;
 }
 
 export function calculateIssues(issues: Issue[], listOfPaidAuthors: string[], stats: Stats) {
@@ -63,6 +73,7 @@ export function calculateIssues(issues: Issue[], listOfPaidAuthors: string[], st
     let waitingDaysArrIssues = [];
     let ossIssueAuthors = [];
 
+    let relevantIssues: Issue[] = [];
     issues.forEach(is => {
         if (new Date(is.createdAt) < stopExtractionDate) {
             return;
@@ -82,6 +93,7 @@ export function calculateIssues(issues: Issue[], listOfPaidAuthors: string[], st
             // waitingDaysArrIssues.push(Math.abs(new Date().getDate() - is.createdAt.getDate()));
         }
 
+        relevantIssues.push(is);
         if (!is.author) {
             return;
         }
@@ -102,9 +114,10 @@ export function calculateIssues(issues: Issue[], listOfPaidAuthors: string[], st
     stats.numberOfGithubIssuesByCommunity = issuesOpenedByOssContributors.length;
     stats.numberOfGithubIssuesByMaintainers = issuesOpenedByMaintainers.length;
     stats.pendingIssues = JSON.stringify(pendingIssues);
+    return relevantIssues;
 }
 
-export function calculateDiscussions(discussions: Discussion[], issues: Issue[], listOfPaidAuthors: string[], stats: Stats) {
+export function calculateDiscussions(discussions: Discussion[],  listOfPaidAuthors: string[], stats: Stats) {
     let checkedDiscussions = [];
     let pendingDiscussions = [];
 
@@ -113,7 +126,7 @@ export function calculateDiscussions(discussions: Discussion[], issues: Issue[],
     let waitingDaysArrDiscussions = [];
     let ossDiscussionsAuthors = [];
 
-
+    let relevantDiscussions: Discussion[] = [];
     discussions.forEach(dis => {
         if (new Date(dis.createdAt) < stopExtractionDate) {
             return;
@@ -129,6 +142,9 @@ export function calculateDiscussions(discussions: Discussion[], issues: Issue[],
             pendingDiscussions.push(dis.number);
             // waitingDaysArrDiscussions.push(Math.abs(new Date().getDate() - dis.createdAt.getDate()));
         }
+
+        relevantDiscussions.push(dis);
+
         if (!dis.author) {
             return;
         }
@@ -139,7 +155,6 @@ export function calculateDiscussions(discussions: Discussion[], issues: Issue[],
             discussionsOpenedByOssContributors.push(dis.title);
             ossDiscussionsAuthors.push(dis.author)
         }
-
     });
 
     let sumWaitingTimeDiscussions = 0;
@@ -151,5 +166,7 @@ export function calculateDiscussions(discussions: Discussion[], issues: Issue[],
     stats.numberOfGithubDiscussionsByCommunity = discussionsOpenedByOssContributors.length;
     stats.numberOfGithubDiscussionsByMaintainers = discussionsOpenedByMaintainers.length;
     stats.pendingDiscussions = JSON.stringify(pendingDiscussions);
+
+    return relevantDiscussions;
 }
 

@@ -1,5 +1,3 @@
-import * as querystring from "querystring";
-
 export const enum ReviewState {
     COMMENTED = 'COMMENTED',
     CHANGES_REQUESTED = 'CHANGES_REQUESTED',
@@ -21,10 +19,10 @@ export interface Comment {
 export interface GithubData {
     number: number;
     title: string
-    author?: string;
     createdAt: Date;
     updatedAt: Date;
     comments?: Comment[];
+    author?: string;
     firstCommentDate?: Date;
     firstCommentAuthor?: string;
     lastCommentDate?: Date;
@@ -32,11 +30,12 @@ export interface GithubData {
 }
 
 export interface PrInfo extends GithubData {
-    isDraft: boolean;
+    isDraft?: boolean;
     reviewsAndComments?: Review[];
     participants?: string[];
     lastCommitDate?: Date;
     state?: string;
+    requiresReview?: number[];
 }
 export interface Issue extends GithubData{
     labels?: string[];
@@ -48,3 +47,22 @@ export interface Discussion extends GithubData{
     answerChosenAt?: Date;
 }
 
+export interface Stats {
+    prsRequireAttention?: string;
+    pendingNewPrs?: string;
+    pendingDiscussions?: string;
+    pendingIssues?: string;
+
+    prAverageTimeResponse?: number,
+    discussionsAverageTimeResponse?: number,
+    issuesAverageTimeResponse?: number,
+
+    numberOfOpenedPrsByCommunity?: number,
+    numberOfOpenedPrsByMaintainers?: number,
+
+    numberOfGithubIssuesByCommunity?: number,
+    numberOfGithubIssuesByMaintainers?: number,
+
+    numberOfGithubDiscussionsByCommunity?: number;
+    numberOfGithubDiscussionsByMaintainers?: number;
+}

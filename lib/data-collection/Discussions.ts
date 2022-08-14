@@ -61,17 +61,15 @@ export class Discussions extends GithubExtractor {
         }
 
         for (const dis of data.discussions.nodes) {
+            const author = dis.author ? dis.author.login : '';
             let discussion: Discussion = {
                 title: dis.title,
                 number: dis.number,
                 createdAt: new Date(dis.createdAt),
                 updatedAt: new Date(dis.updatedAt),
                 answerChosenAt: new Date(dis.answerChosenAt),
+                author: author,
             };
-
-            if(dis.author?.login) {
-                discussion.author = dis.author.login;
-            }
 
             if (dis.answer?.author) {
                 discussion.answerAuthor = dis.answer.author.login;
@@ -80,7 +78,8 @@ export class Discussions extends GithubExtractor {
             if (dis.comments?.nodes?.length > 0) {
                 discussion.comments = [];
                 for (const comment of dis.comments.nodes) {
-                    const cmt: Comment = {author: comment.author.login, submittedAt: new Date(comment.createdAt)}
+                    const authorName = comment.author?.login ?? '';
+                    const cmt: Comment = {author: authorName, submittedAt: new Date(comment.createdAt)}
                     discussion.comments.push(cmt);
                 }
             }
