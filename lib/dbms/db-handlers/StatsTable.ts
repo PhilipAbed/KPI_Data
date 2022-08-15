@@ -4,10 +4,12 @@ import {Stats} from "../../data-collection/types";
 export class StatsTable {
     private stats: Stats;
     private conn: any;
+    private date: Date;
 
-    constructor(stats: Stats, conn: any) {
+    constructor(stats: Stats, conn: any, date: Date) {
         this.stats = stats;
         this.conn = conn;
+        this.date = date;
     }
 
     public update() {
@@ -19,7 +21,7 @@ export class StatsTable {
 
     prepareData(st: Stats): any {
         return [
-            new Date().toDateString(),
+            this.date,
             st.numberOfGithubIssuesByMaintainers,
             st.numberOfGithubIssuesByCommunity,
             st.numberOfGithubDiscussionsByMaintainers,

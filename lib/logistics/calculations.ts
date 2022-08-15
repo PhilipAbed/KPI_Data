@@ -8,29 +8,28 @@ export function calculatePrs(prs: PrInfo[], listOfPaidAuthors: string[], stats: 
     let pendingPrs = [];
     let prsOpenedByMaintainers = [];
     let prsOpenedByOssContributors = [];
-    let waitingDaysArrPR = [];
+    let waitingHoursArrPR = [];
     let ossPrAuthors = [];
     let openNonDraftPrs = [];
 
     let relevantPRs: PrInfo[] = [];
     prs.forEach(pr => {
-        if (new Date(pr.createdAt) < stopExtractionDate) {
+        if (pr.updatedAt < stopExtractionDate) {
             return;
         }
-        pr.requiresReview = [];
         if (pr.state === 'OPEN' && !pr.isDraft) {
             openNonDraftPrs.push(pr.number);
-            pr.requiresReview.push(pr.number);
+            pr.requiresReview = true;
         }
 
-        let acknowledgementDays = undefined;
+        let waitingTimeInHours = undefined;
         if (pr.reviewsAndComments) {
-            acknowledgementDays = firstAndLastComments(pr, pr.reviewsAndComments);
+            waitingTimeInHours = firstAndLastComments(pr, pr.reviewsAndComments);
         }
 
-        if (acknowledgementDays != null) {
+        if (waitingTimeInHours != null) {
             checkedPrs.push(pr);
-            waitingDaysArrPR.push(acknowledgementDays);
+            waitingHoursArrPR.push(waitingTimeInHours);
         } else {
             if (pr.state === 'OPEN' && !pr.isDraft) {
                 pendingPrs.push(pr.number);
@@ -52,11 +51,11 @@ export function calculatePrs(prs: PrInfo[], listOfPaidAuthors: string[], stats: 
     });
 
     let sumWaitingTimePrs = 0;
-    for (const number of waitingDaysArrPR) {
+    for (const number of waitingHoursArrPR) {
         sumWaitingTimePrs += number;
     }
 
-    stats.prAverageTimeResponse = sumWaitingTimePrs / waitingDaysArrPR.length;
+    stats.prAverageTimeResponse = sumWaitingTimePrs / waitingHoursArrPR.length;
     stats.numberOfOpenedPrsByMaintainers = prsOpenedByMaintainers.length;
     stats.numberOfOpenedPrsByCommunity = prsOpenedByOssContributors.length;
     stats.pendingNewPrs = JSON.stringify(pendingPrs);
@@ -70,27 +69,26 @@ export function calculateIssues(issues: Issue[], listOfPaidAuthors: string[], st
 
     let issuesOpenedByMaintainers = [];
     let issuesOpenedByOssContributors = [];
-    let waitingDaysArrIssues = [];
+    let waitingHoursArrIssues = [];
     let ossIssueAuthors = [];
 
     let relevantIssues: Issue[] = [];
     issues.forEach(is => {
-        if (new Date(is.createdAt) < stopExtractionDate) {
+        if (is.updatedAt < stopExtractionDate) {
             return;
         }
-        let acknowledgementDays = null;
+        let waitingTimeInHours = null;
         if (is.comments) {
-            acknowledgementDays = firstAndLastComments(is, is.comments);
+            waitingTimeInHours = firstAndLastComments(is, is.comments);
         }
 
-        if (acknowledgementDays != null) {
+        if (waitingTimeInHours != null) {
             checkedIssues.push(is);
-            waitingDaysArrIssues.push(acknowledgementDays);
+            waitingHoursArrIssues.push(waitingTimeInHours);
         } else {
             if (is.state === 'OPEN') {
                 pendingIssues.push(is.number);
             }
-            // waitingDaysArrIssues.push(Math.abs(new Date().getDate() - is.createdAt.getDate()));
         }
 
         relevantIssues.push(is);
@@ -107,10 +105,10 @@ export function calculateIssues(issues: Issue[], listOfPaidAuthors: string[], st
     });
 
     let sumWaitingTimeIssues = 0;
-    for (const number of waitingDaysArrIssues) {
+    for (const number of waitingHoursArrIssues) {
         sumWaitingTimeIssues += number;
     }
-    stats.issuesAverageTimeResponse = sumWaitingTimeIssues / waitingDaysArrIssues.length;
+    stats.issuesAverageTimeResponse = sumWaitingTimeIssues / waitingHoursArrIssues.length;
     stats.numberOfGithubIssuesByCommunity = issuesOpenedByOssContributors.length;
     stats.numberOfGithubIssuesByMaintainers = issuesOpenedByMaintainers.length;
     stats.pendingIssues = JSON.stringify(pendingIssues);
@@ -123,24 +121,23 @@ export function calculateDiscussions(discussions: Discussion[], listOfPaidAuthor
 
     let discussionsOpenedByMaintainers = [];
     let discussionsOpenedByOssContributors = [];
-    let waitingDaysArrDiscussions = [];
+    let waitingHoursArrDiscussions = [];
     let ossDiscussionsAuthors = [];
 
     let relevantDiscussions: Discussion[] = [];
     discussions.forEach(dis => {
-        if (new Date(dis.createdAt) < stopExtractionDate) {
+        if (dis.updatedAt < stopExtractionDate) {
             return;
         }
-        let acknowledgementDays = null;
+        let waitingTimeInHours = null;
         if (dis.comments) {
-            acknowledgementDays = firstAndLastComments(dis, dis.comments);
+            waitingTimeInHours = firstAndLastComments(dis, dis.comments);
         }
-        if (acknowledgementDays != null) {
+        if (waitingTimeInHours != null) {
             checkedDiscussions.push(dis);
-            waitingDaysArrDiscussions.push(acknowledgementDays);
+            waitingHoursArrDiscussions.push(waitingTimeInHours);
         } else {
             pendingDiscussions.push(dis.number);
-            // waitingDaysArrDiscussions.push(Math.abs(new Date().getDate() - dis.createdAt.getDate()));
         }
 
         relevantDiscussions.push(dis);
@@ -158,11 +155,11 @@ export function calculateDiscussions(discussions: Discussion[], listOfPaidAuthor
     });
 
     let sumWaitingTimeDiscussions = 0;
-    for (const number of waitingDaysArrDiscussions) {
+    for (const number of waitingHoursArrDiscussions) {
         sumWaitingTimeDiscussions += number;
     }
 
-    stats.discussionsAverageTimeResponse = sumWaitingTimeDiscussions / waitingDaysArrDiscussions.length;
+    stats.discussionsAverageTimeResponse = sumWaitingTimeDiscussions / waitingHoursArrDiscussions.length;
     stats.numberOfGithubDiscussionsByCommunity = discussionsOpenedByOssContributors.length;
     stats.numberOfGithubDiscussionsByMaintainers = discussionsOpenedByMaintainers.length;
     stats.pendingDiscussions = JSON.stringify(pendingDiscussions);

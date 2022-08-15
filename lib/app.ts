@@ -46,20 +46,20 @@ export async function main() {
     const relevantDiscussions = calculateDiscussions(discussions, listOfPaidAuthors, stats);
     const relevantIssues = calculateIssues(issues, listOfPaidAuthors, stats);
     const relevantPrs = calculatePrs(pullRequests, listOfPaidAuthors, stats);
-
     let dbconn: Idbconnection;
     if (process.env.KPI_SQLITE_DB_FILE) {
         dbconn = new SqlLite();
     } else {
         dbconn = new MysqlConnection();
     }
-
     await dbconn.connectToDB();
+
+
     try {
         const discTable = new DiscussionTable(relevantDiscussions, dbconn);
         const issueTable = new IssueTable(relevantIssues, dbconn);
         const prTable = new PullRequestTable(relevantPrs, dbconn);
-        const statsTable = new StatsTable(stats, dbconn);
+        const statsTable = new StatsTable(stats, dbconn, new Date());
         await discTable.update();
         await issueTable.update();
         await prTable.update();

@@ -3,65 +3,11 @@ import {GithubExtractor, stopExtractionDate} from "./GithubExtractor";
 
 export class PullRequests extends GithubExtractor {
 
-    /*  protected getQuery(): string {
-          return `
-          {
-             repository(owner:"renovatebot", name: "renovate") {
-                pullRequests(last:100) {
-                   totalCount
-                      pageInfo {
-                        startCursor
-                        endCursor
-                        hasNextPage
-                        hasPreviousPage
-                      }
-                   nodes {
-                      isDraft
-                      author {
-                            login
-                      }
-                      participants(first:10) {
-                               nodes {
-                                       login
-                               }
-                      }
-                      commits(last:1){
-                        nodes {
-                          commit {
-                            pushedDate
-                          }
-                        }
-                      }
-                      comments(last:100){
-                        nodes{
-                          author{ login}
-                          createdAt
-                        }
-                      }
-                      number
-                      title
-                      createdAt
-                      updatedAt
-                      reviews(last:100) {
-                          nodes {
-                             author {
-                                login
-                             }
-                             state
-                             submittedAt
-                          }
-                      }
-                   }
-                }
-             }
-          }
-    `;
-      }*/
     protected getQuery(): string {
         return `
         {
            repository(owner:"renovatebot", name: "renovate") {
-              pullRequests(last:100) {
+              pullRequests(first:100, orderBy: {field: UPDATED_AT, direction: DESC}) {
                  totalCount 
                     pageInfo {
                       startCursor
@@ -114,14 +60,14 @@ export class PullRequests extends GithubExtractor {
     }
 
     protected paginate(data: any) {
-        return data.pullRequests?.pageInfo?.hasPreviousPage &&
-            (new Date(data.pullRequests.nodes[0].createdAt) > stopExtractionDate)
+        return data.pullRequests?.pageInfo?.hasNextPage &&
+            (new Date(data.pullRequests.nodes[data.pullRequests.nodes.length - 1].updatedAt) > stopExtractionDate)
     }
-
     protected getNextQuery(data: any): string {
-        const startCursor = data.pullRequests.pageInfo.startCursor;
+        const endCursor = data.pullRequests.pageInfo.endCursor;
         return this.getQuery()
-            .replace('pullRequests(last:100)', `pullRequests(last:100, before: "${startCursor}")`)
+            .replace('pullRequests(first:100, orderBy: {field: UPDATED_AT, direction: DESC})',
+                `pullRequests(first:100, orderBy: {field: UPDATED_AT, direction: DESC}, after: "${endCursor}")`);
     }
 
     protected aggregateData(data: any, nextData: any): boolean {

@@ -35,7 +35,7 @@ export interface PrInfo extends GithubData {
     participants?: string[];
     lastCommitDate?: Date;
     state?: string;
-    requiresReview?: number[];
+    requiresReview?: boolean;
 }
 
 export interface Issue extends GithubData {

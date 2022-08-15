@@ -3,8 +3,8 @@ import {Repository} from "github-graphql-schema";
 import {GithubData} from "./types";
 
 //7 days ago
-// export const stopExtractionDate: Date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-export const stopExtractionDate: Date = new Date('2022-02-01');
+export const stopExtractionDate: Date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+// export const stopExtractionDate: Date = new Date('2022-02-01');
 
 export abstract class GithubExtractor {
     protected abstract parseData(data: any): GithubData[]

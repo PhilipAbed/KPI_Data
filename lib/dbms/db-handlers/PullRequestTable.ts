@@ -55,7 +55,7 @@ export class PullRequestTable implements IgithubDB {
 
     async updateRow(id: number, p: PrInfo) {
         const pr = this.convertToObj(p);
-        const sql = `UPDATE pull_request SET id=${pr.id}, title="${pr.title}", createdAt="${pr.createdAt}", updatedAt="${pr.updatedAt}", author="${pr.author}", comments="${pr.comments}", firstCommentDate="${pr.firstCommentDate}", firstCommentAuthor="${pr.firstCommentAuthor}", lastCommentDate="${pr.lastCommentDate}",lastCommentAuthor="${pr.lastCommentAuthor}",prState="${pr.state}",isDraft="${pr.isDraft}", reviewsAndComments="${pr.reviewsAndComments}", participants="${pr.participants}", lastCommitDate="${pr.lastCommitDate}", requiresReview="${pr.requiresReview}" where id = ${id}`;
+        const sql = `UPDATE pull_request SET id=${pr.id}, title="${pr.title}", createdAt="${pr.createdAt}", updatedAt="${pr.updatedAt}", author="${pr.author}", comments="${pr.comments}", firstCommentDate="${pr.firstCommentDate}", firstCommentAuthor="${pr.firstCommentAuthor}", lastCommentDate="${pr.lastCommentDate}",lastCommentAuthor="${pr.lastCommentAuthor}",prState="${pr.state}",isDraft="${pr.isDraft}", reviewsAndComments="${pr.reviewsAndComments}", participants="${pr.participants}", lastCommitDate="${pr.lastCommitDate}", isReviewed="${!pr.requiresReview}" where id = ${id}`;
         await this.conn.exec(sql);
     }
 

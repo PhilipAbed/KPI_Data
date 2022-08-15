@@ -1,12 +1,14 @@
 import {Comment, GithubData} from "../data-collection/types";
 
 export function firstAndLastComments(data: GithubData, comments: Comment[]) {
-    let acknowledgementDays;
-    for (const review of comments) {
-        if (review.author != 'renovateBot' && review.author != 'renovate' && review.author != data.author) {
-            acknowledgementDays = Math.abs(review.submittedAt.getDate() - data.createdAt.getDate());
-            data.firstCommentAuthor = review.author;
-            data.firstCommentDate = review.submittedAt;
+    let acknowledgmentInHours;
+    for (const comment of comments) {
+        if (comment.author != 'renovateBot' && comment.author != 'renovate' && comment.author != data.author) {
+            // acknowledgmentInHours = Math.abs(review.submittedAt.getDate() - data.createdAt.getDate());
+            // minutes * seconds * milliseconds 60*60*1000 = 3600000
+            acknowledgmentInHours = Math.abs(comment.submittedAt.getTime() - data.createdAt.getTime()) / 3600000;
+            data.firstCommentAuthor = comment.author;
+            data.firstCommentDate = comment.submittedAt;
             break;
         }
     }
@@ -16,7 +18,7 @@ export function firstAndLastComments(data: GithubData, comments: Comment[]) {
         data.lastCommentDate = lastComment.submittedAt;
         data.lastCommentDateAuthor = lastComment.author;
     }
-    return acknowledgementDays;
+    return acknowledgmentInHours;
 }
 
 

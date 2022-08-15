@@ -7,7 +7,7 @@ export class Discussions extends GithubExtractor {
         return `
     {
      repository(owner: "renovatebot", name: "renovate") {
-        discussions(first: 100) {
+        discussions(first:100, orderBy: {field: UPDATED_AT, direction: DESC}) {
           totalCount 
           pageInfo {
             startCursor
@@ -46,7 +46,8 @@ export class Discussions extends GithubExtractor {
     protected getNextQuery(data: any): string {
         const endCursor = data.discussions.pageInfo.endCursor;
         return this.getQuery()
-            .replace('discussions(first: 100)', `discussions(first: 100, after: "${endCursor}")`)
+            .replace('discussions(first:100, orderBy: {field: UPDATED_AT, direction: DESC})',
+                `discussions(first:100, orderBy: {field: UPDATED_AT, direction: DESC}, after: "${endCursor}")`);
     }
 
     protected aggregateData(data: any, nextData: any) {

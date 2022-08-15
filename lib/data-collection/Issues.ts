@@ -6,7 +6,7 @@ export class Issues extends GithubExtractor {
         return `
         {
            repository(owner:"renovatebot", name: "renovate") {
-                issues(last:100) {
+                issues(first:100, orderBy: {field: UPDATED_AT, direction: DESC}) {
                    totalCount 
                     pageInfo {
                       startCursor
@@ -40,14 +40,14 @@ export class Issues extends GithubExtractor {
     }
 
     protected paginate(data: any) {
-        return data.issues?.pageInfo?.hasPreviousPage
-            && (new Date(data.issues.nodes[0].createdAt) > stopExtractionDate)
+        return data.issues?.pageInfo?.hasNextPage
+            && (new Date(data.issues.nodes[data.issues.nodes.length - 1].updatedAt) > stopExtractionDate)
     }
 
     protected getNextQuery(data: any): string {
-        const startCursor = data.issues.pageInfo.startCursor;
+        const endCursor = data.issues.pageInfo.endCursor;
         return this.getQuery()
-            .replace('issues(last:100)', `issues(last:100, before: "${startCursor}")`)
+            .replace('issues(first:100, orderBy: {field: UPDATED_AT, direction: DESC})', `issues(first:100, orderBy: {field: UPDATED_AT, direction: DESC}, after: "${endCursor}")`);
     }
 
     protected aggregateData(data: any, nextData: any) {
