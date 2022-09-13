@@ -2,7 +2,7 @@ import {Discussion, GithubData, Issue, PrInfo, Stats} from "../data-collection/t
 import {calculateDiscussions, calculateIssues, calculatePrs} from "./calculations";
 import {stopExtractionDate} from "../data-collection/GithubExtractor";
 import {Idbconnection} from "../dbms/interfaces/Idbconnection";
-import {StatsTable} from "../dbms/db-handlers/StatsTable";
+import {StatsTable} from "../dbms/tables/StatsTable";
 
 function get7daysAgo(oldDate: Date) {
     return new Date(oldDate.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -13,7 +13,7 @@ interface StatsRecord {
     stats: Stats
 }
 
-export async function historyScript(discussions: Discussion[], issues: Issue[], prs: PrInfo[], listOfPaidAuthors: string[], dbconn: Idbconnection) {
+export async function updateHistoryStats(discussions: Discussion[], issues: Issue[], prs: PrInfo[], listOfPaidAuthors: string[], dbconn: Idbconnection, stopExtractionDate: Date) {
     let allStats: StatsRecord[] = [];
     let date = new Date();
     let olderDate = get7daysAgo(date);
@@ -36,8 +36,8 @@ export async function historyScript(discussions: Discussion[], issues: Issue[], 
     }
 
     for(const statRecord of allStats) {
-         const statsTable = new StatsTable(statRecord.stats, dbconn, statRecord.statsDate);
-         await statsTable.update();
+         const statsTable = new StatsTable(dbconn, statRecord.statsDate);
+         await statsTable.update(statRecord.stats);
     }
 }
 

@@ -64,23 +64,23 @@ export class Discussions extends GithubExtractor {
         for (const dis of data.discussions.nodes) {
             const author = dis.author ? dis.author.login : '';
             let discussion: Discussion = {
-                title: dis.title,
+                title: dis.title.replace(/[\"\']/g, ""),
                 number: dis.number,
                 createdAt: new Date(dis.createdAt),
                 updatedAt: new Date(dis.updatedAt),
                 answerChosenAt: new Date(dis.answerChosenAt),
-                author: author,
+                author: author.replace(/[\"\']/g, ""),
             };
 
             if (dis.answer?.author) {
-                discussion.answerAuthor = dis.answer.author.login;
+                discussion.answerAuthor = dis.answer.author.login.replace(/[\"\']/g, "");
             }
 
             if (dis.comments?.nodes?.length > 0) {
                 discussion.comments = [];
                 for (const comment of dis.comments.nodes) {
                     const authorName = comment.author?.login ?? '';
-                    const cmt: Comment = {author: authorName, submittedAt: new Date(comment.createdAt)}
+                    const cmt: Comment = {author: authorName.replace(/[\"\']/g, ""), submittedAt: new Date(comment.createdAt)}
                     discussion.comments.push(cmt);
                 }
             }

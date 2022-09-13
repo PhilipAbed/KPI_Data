@@ -1,3 +1,4 @@
 /node_modules
 /*.js
 /.idea
+/lib/logistics/chart/json-data.js

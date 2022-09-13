@@ -20,11 +20,7 @@ export class SqlLite implements Idbconnection {
     async exec(query: string): Promise<any> {
         let rows: any;
         try {
-            if (query.toLowerCase().trim().startsWith('select')) {
-                rows = await this.conn.all(query);
-            } else {
-                rows = await this.conn.all(query);
-            }
+            rows = await this.conn.all(query);
         } catch (err) {
             console.log(err);
         }

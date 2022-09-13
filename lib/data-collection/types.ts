@@ -26,7 +26,7 @@ export interface GithubData {
     firstCommentDate?: Date;
     firstCommentAuthor?: string;
     lastCommentDate?: Date;
-    lastCommentDateAuthor?: string;
+    lastCommentAuthor?: string;
 }
 
 export interface PrInfo extends GithubData {
@@ -38,8 +38,13 @@ export interface PrInfo extends GithubData {
     requiresReview?: boolean;
 }
 
+export interface Label {
+    name?: string,
+    updatedAt?: Date,
+}
+
 export interface Issue extends GithubData {
-    labels?: string[];
+    labels?: Label[];
     state?: string;
 }
 
@@ -66,4 +71,5 @@ export interface Stats {
 
     numberOfGithubDiscussionsByCommunity?: number;
     numberOfGithubDiscussionsByMaintainers?: number;
+    statsDate?: string;
 }

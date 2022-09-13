@@ -1,18 +1,17 @@
 import {GithubData} from "../../data-collection/types";
 
-
-export interface IgithubDB {
-    update();
-
-    selectTable(): any;
-
+export interface IGithubDB {
     insertRows(data: GithubData[]);
 
     updateRows(data: GithubData[], table: any)
 
     updateRow(id: number, data: GithubData);
 
-    convertToArr(data: GithubData): any;
-
     convertToObj(data: GithubData): any;
+
+    update(data: GithubData[]);
+
+    extractTableToObj(): Promise<GithubData[]>;
+
+    convertToArr(data: GithubData): any;
 }

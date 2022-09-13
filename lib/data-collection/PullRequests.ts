@@ -84,11 +84,11 @@ export class PullRequests extends GithubExtractor {
         for (const pr of data.pullRequests.nodes) {
             const author = pr.author ? pr.author.login : '';
             let prInfo: PrInfo = {
-                title: pr.title,
+                title: pr.title.replace(/[\"\']/g, ""),
                 number: pr.number,
                 createdAt: new Date(pr.createdAt),
                 updatedAt: new Date(pr.updatedAt),
-                author: author,
+                author: author.replace(/[\"\']/g, ""),
                 isDraft: pr.isDraft,
             };
             prInfo.reviewsAndComments = [];
@@ -99,7 +99,7 @@ export class PullRequests extends GithubExtractor {
                 for (const revObj of pr.reviews.nodes) {
                     const authorName = revObj.author?.login ?? '';
                     const review: Review = {
-                        author: authorName,
+                        author: authorName.replace(/[\"\']/g, ""),
                         state: revObj.state,
                         submittedAt: new Date(revObj.submittedAt)
                     }
@@ -109,7 +109,7 @@ export class PullRequests extends GithubExtractor {
             if (pr.participants?.nodes?.length > 0) {
                 prInfo.participants = []
                 for (const participant of pr.participants.nodes) {
-                    prInfo.participants.push(participant.login)
+                    prInfo.participants.push(participant.login.replace(/[\"\']/g, ""))
                 }
             }
             if (pr.comments?.nodes?.length > 0) {
@@ -117,13 +117,13 @@ export class PullRequests extends GithubExtractor {
                 for (const comment of pr.comments.nodes) {
                     const authorNameReviewComment = comment.author?.login ?? '';
                     const review: Review = {
-                        author: authorNameReviewComment,
+                        author: authorNameReviewComment.replace(/[\"\']/g, ""),
                         state: ReviewState.PR_COMMENT,
                         submittedAt: new Date(comment.createdAt)
                     }
                     prInfo.reviewsAndComments.push(review);
                     const authorName = comment.author?.login ?? '';
-                    const cmt: Comment = {author: authorName, submittedAt: new Date(comment.createdAt)}
+                    const cmt: Comment = {author: authorName.replace(/[\"\']/g, ""), submittedAt: new Date(comment.createdAt)}
                     prInfo.comments.push(cmt);
                 }
                 prInfo.reviewsAndComments = prInfo.reviewsAndComments.sort(

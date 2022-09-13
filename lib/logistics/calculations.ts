@@ -4,7 +4,6 @@ import {firstAndLastComments} from "./util";
 
 
 export function calculatePrs(prs: PrInfo[], listOfPaidAuthors: string[], stats: Stats) {
-    let checkedPrs = [];
     let pendingPrs = [];
     let prsOpenedByMaintainers = [];
     let prsOpenedByOssContributors = [];
@@ -17,29 +16,20 @@ export function calculatePrs(prs: PrInfo[], listOfPaidAuthors: string[], stats: 
         if (pr.updatedAt < stopExtractionDate) {
             return;
         }
+        if (!pr.author) {
+            return;
+        }
+        relevantPRs.push(pr);
+
         if (pr.state === 'OPEN' && !pr.isDraft) {
             openNonDraftPrs.push(pr.number);
             pr.requiresReview = true;
+        } else {
+            pr.requiresReview = false;
         }
-
         let waitingTimeInHours = undefined;
         if (pr.reviewsAndComments) {
             waitingTimeInHours = firstAndLastComments(pr, pr.reviewsAndComments);
-        }
-
-        if (waitingTimeInHours != null) {
-            checkedPrs.push(pr);
-            waitingHoursArrPR.push(waitingTimeInHours);
-        } else {
-            if (pr.state === 'OPEN' && !pr.isDraft) {
-                pendingPrs.push(pr.number);
-            }
-            // waitingDaysArrPR.push(Math.abs(new Date().getDate() - pr.createdAt.getDate()));
-        }
-
-        relevantPRs.push(pr);
-        if (!pr.author) {
-            return;
         }
 
         if (listOfPaidAuthors.includes(pr.author)) {
@@ -47,6 +37,13 @@ export function calculatePrs(prs: PrInfo[], listOfPaidAuthors: string[], stats: 
         } else {
             prsOpenedByOssContributors.push(pr.title);
             ossPrAuthors.push(pr.author)
+            if (waitingTimeInHours != null) {
+                waitingHoursArrPR.push(waitingTimeInHours);
+            } else {
+                if (pr.state === 'OPEN' && !pr.isDraft) {
+                    pendingPrs.push(pr.number);
+                }
+            }
         }
     });
 
@@ -55,7 +52,7 @@ export function calculatePrs(prs: PrInfo[], listOfPaidAuthors: string[], stats: 
         sumWaitingTimePrs += number;
     }
 
-    stats.prAverageTimeResponse = sumWaitingTimePrs / waitingHoursArrPR.length;
+    stats.prAverageTimeResponse = (sumWaitingTimePrs/ 24) / waitingHoursArrPR.length;
     stats.numberOfOpenedPrsByMaintainers = prsOpenedByMaintainers.length;
     stats.numberOfOpenedPrsByCommunity = prsOpenedByOssContributors.length;
     stats.pendingNewPrs = JSON.stringify(pendingPrs);
@@ -64,7 +61,6 @@ export function calculatePrs(prs: PrInfo[], listOfPaidAuthors: string[], stats: 
 }
 
 export function calculateIssues(issues: Issue[], listOfPaidAuthors: string[], stats: Stats) {
-    let checkedIssues = [];
     let pendingIssues = [];
 
     let issuesOpenedByMaintainers = [];
@@ -77,30 +73,47 @@ export function calculateIssues(issues: Issue[], listOfPaidAuthors: string[], st
         if (is.updatedAt < stopExtractionDate) {
             return;
         }
+        if (!is.author) {
+            return;
+        }
+
+        relevantIssues.push(is);
+
         let waitingTimeInHours = null;
         if (is.comments) {
             waitingTimeInHours = firstAndLastComments(is, is.comments);
         }
-
-        if (waitingTimeInHours != null) {
-            checkedIssues.push(is);
-            waitingHoursArrIssues.push(waitingTimeInHours);
-        } else {
-            if (is.state === 'OPEN') {
-                pendingIssues.push(is.number);
+        if(is.labels) {
+            let lowestTime;
+            for (const label of is.labels) {
+                if((label.name.startsWith('status') && !label.name.includes('requirements')) ||
+                    (label.name.startsWith('priority') && !label.name.includes('triage')) ||
+                    (!label.name.startsWith('priority') && !label.name.startsWith('status') && !label.name.startsWith('type'))
+                ){
+                    const hours = Math.abs(label.updatedAt.getTime() - is.createdAt.getTime()) / 3600000;
+                    if(!lowestTime || hours < lowestTime) {
+                        lowestTime = hours;
+                    }
+                }
+            }
+            if(!waitingTimeInHours || lowestTime < waitingTimeInHours) {
+                waitingTimeInHours = lowestTime;
             }
         }
 
-        relevantIssues.push(is);
-        if (!is.author) {
-            return;
-        }
 
         if (listOfPaidAuthors.includes(is.author)) {
             issuesOpenedByMaintainers.push(is.title)
         } else {
             issuesOpenedByOssContributors.push(is.title);
             ossIssueAuthors.push(is.author)
+            if (waitingTimeInHours != null) {
+                waitingHoursArrIssues.push(waitingTimeInHours);
+            } else {
+                if (is.state === 'OPEN') {
+                    pendingIssues.push(is.number);
+                }
+            }
         }
     });
 
@@ -108,7 +121,7 @@ export function calculateIssues(issues: Issue[], listOfPaidAuthors: string[], st
     for (const number of waitingHoursArrIssues) {
         sumWaitingTimeIssues += number;
     }
-    stats.issuesAverageTimeResponse = sumWaitingTimeIssues / waitingHoursArrIssues.length;
+    stats.issuesAverageTimeResponse = (sumWaitingTimeIssues/ 24)  / waitingHoursArrIssues.length;
     stats.numberOfGithubIssuesByCommunity = issuesOpenedByOssContributors.length;
     stats.numberOfGithubIssuesByMaintainers = issuesOpenedByMaintainers.length;
     stats.pendingIssues = JSON.stringify(pendingIssues);
@@ -116,7 +129,6 @@ export function calculateIssues(issues: Issue[], listOfPaidAuthors: string[], st
 }
 
 export function calculateDiscussions(discussions: Discussion[], listOfPaidAuthors: string[], stats: Stats) {
-    let checkedDiscussions = [];
     let pendingDiscussions = [];
 
     let discussionsOpenedByMaintainers = [];
@@ -129,21 +141,15 @@ export function calculateDiscussions(discussions: Discussion[], listOfPaidAuthor
         if (dis.updatedAt < stopExtractionDate) {
             return;
         }
-        let waitingTimeInHours = null;
-        if (dis.comments) {
-            waitingTimeInHours = firstAndLastComments(dis, dis.comments);
-        }
-        if (waitingTimeInHours != null) {
-            checkedDiscussions.push(dis);
-            waitingHoursArrDiscussions.push(waitingTimeInHours);
-        } else {
-            pendingDiscussions.push(dis.number);
+        if (!dis.author) {
+            return;
         }
 
         relevantDiscussions.push(dis);
 
-        if (!dis.author) {
-            return;
+        let waitingTimeInHours = null;
+        if (dis.comments) {
+            waitingTimeInHours = firstAndLastComments(dis, dis.comments);
         }
 
         if (listOfPaidAuthors.includes(dis.author)) {
@@ -151,6 +157,12 @@ export function calculateDiscussions(discussions: Discussion[], listOfPaidAuthor
         } else {
             discussionsOpenedByOssContributors.push(dis.title);
             ossDiscussionsAuthors.push(dis.author)
+            // only community PRs are relevant for response times
+            if (waitingTimeInHours != null) {
+                waitingHoursArrDiscussions.push(waitingTimeInHours);
+            } else {
+                pendingDiscussions.push(dis.number);
+            }
         }
     });
 
@@ -159,11 +171,10 @@ export function calculateDiscussions(discussions: Discussion[], listOfPaidAuthor
         sumWaitingTimeDiscussions += number;
     }
 
-    stats.discussionsAverageTimeResponse = sumWaitingTimeDiscussions / waitingHoursArrDiscussions.length;
+    stats.discussionsAverageTimeResponse = (sumWaitingTimeDiscussions/ 24)  / waitingHoursArrDiscussions.length;
     stats.numberOfGithubDiscussionsByCommunity = discussionsOpenedByOssContributors.length;
     stats.numberOfGithubDiscussionsByMaintainers = discussionsOpenedByMaintainers.length;
     stats.pendingDiscussions = JSON.stringify(pendingDiscussions);
-
     return relevantDiscussions;
 }
 

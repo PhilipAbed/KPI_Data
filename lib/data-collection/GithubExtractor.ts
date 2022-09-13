@@ -3,7 +3,7 @@ import {Repository} from "github-graphql-schema";
 import {GithubData} from "./types";
 
 //7 days ago
-export const stopExtractionDate: Date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+export const stopExtractionDate: Date = new Date(Date.now() - 120 * 24 * 60 * 60 * 1000);
 // export const stopExtractionDate: Date = new Date('2022-02-01');
 
 export abstract class GithubExtractor {
@@ -23,6 +23,9 @@ export abstract class GithubExtractor {
         this.token = token;
     }
 
+    /**
+     * This method will extract all data from the given API until from `stopExtractionDate` until today
+     */
     public async getApiData() {
         const query = this.getQuery();
         let data = await this.callGithubApi(query);

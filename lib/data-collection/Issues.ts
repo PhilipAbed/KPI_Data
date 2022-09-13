@@ -1,4 +1,4 @@
-import {Comment, GithubData, Issue} from "./types";
+import {Comment, GithubData, Issue, Label} from "./types";
 import {GithubExtractor, stopExtractionDate} from "./GithubExtractor";
 
 export class Issues extends GithubExtractor {
@@ -23,6 +23,7 @@ export class Issues extends GithubExtractor {
                         labels(first:10){
                         nodes{
                             name
+                            updatedAt
                           }
                         }
                         number
@@ -63,24 +64,25 @@ export class Issues extends GithubExtractor {
         for (const is of data.issues.nodes) {
             const author = is.author ? is.author.login : '';
             let issue: Issue = {
-                title: is.title,
+                title: is.title.replace(/[\"\']/g, ""),
                 number: is.number,
                 createdAt: new Date(is.createdAt),
                 updatedAt: new Date(is.updatedAt),
-                author: author,
+                author: author.replace(/[\"\']/g, ""),
                 state: is.state,
             };
             if (is.labels?.nodes?.length > 0) {
                 issue.labels = [];
                 for (const label of is.labels.nodes) {
-                    issue.labels.push(label);
+                    const myLabel: Label = {name: label.name.replace(/[\"\']/g, ""), updatedAt: new Date(label.updatedAt)}
+                    issue.labels.push(myLabel);
                 }
             }
             if (is.comments?.nodes?.length > 0) {
                 issue.comments = [];
                 for (const comment of is.comments.nodes) {
                     const authorName = comment.author?.login ?? '';
-                    const cmt: Comment = {author: authorName, submittedAt: new Date(comment.createdAt)}
+                    const cmt: Comment = {author: authorName.replace(/[\"\']/g, ""), submittedAt: new Date(comment.createdAt)}
                     issue.comments.push(cmt);
                 }
             }
