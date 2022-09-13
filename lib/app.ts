@@ -96,6 +96,7 @@ export async function main() {
             await updateHistoryStats(discussions, issues, pullRequests, listOfPaidAuthors, dbconn, stopExtractionDate);
             return;
         }
+
         if (process.argv.includes("-d")) {
             const statsTable = new StatsTable(dbconn);
             const stats: Stats[] = await statsTable.extractTableToObj();
