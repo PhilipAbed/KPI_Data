@@ -1,4 +1,4 @@
-import {Comment, GithubData} from "../data-collection/types";
+import type {Comment, GithubData} from "../data-collection/types";
 
 export function firstAndLastComments(data: GithubData, comments: Comment[]) {
     let acknowledgmentInHours;

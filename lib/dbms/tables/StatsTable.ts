@@ -1,4 +1,4 @@
-import {Stats} from "../../data-collection/types";
+import type {Stats} from "../../data-collection/types";
 import {AbstractDbTable} from "./AbstractDbTable";
 
 
@@ -42,6 +42,7 @@ export class StatsTable extends AbstractDbTable {
             return [];
         }
         let res :Stats[] = [];
+        // @ts-ignore
         table.forEach(row => {
             const stat: Stats = {
                 prsRequireAttention: row.prsRequireAttention? JSON.parse(row.prsRequireAttention) : [],

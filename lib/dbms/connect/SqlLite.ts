@@ -1,13 +1,13 @@
 import * as sqlite from 'sqlite3';
 import {open} from 'sqlite';
-import {Idbconnection} from "../interfaces/Idbconnection";
+import type {Idbconnection} from "../interfaces/Idbconnection";
 
 export class SqlLite implements Idbconnection {
     private conn: any;
 
     public async connectToDB() {
         this.conn = await open({
-            filename: process.env.KPI_SQLITE_DB_FILE,
+            filename: process.env.KPI_SQLITE_DB_FILE!,
             mode: sqlite.OPEN_READWRITE,
             driver: sqlite.Database
         });
