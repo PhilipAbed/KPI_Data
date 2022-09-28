@@ -1,7 +1,7 @@
 export interface Idbconnection {
-    connectToDB();
+    connectToDB(): void;
 
-    close();
+    close(): void;
 
-    exec(query: string);
+    exec(query: string): Promise<any>;
 }

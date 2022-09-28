@@ -1,7 +1,6 @@
-import {Discussion, GithubData, Issue, PrInfo, Stats} from "../data-collection/types";
+import type {Discussion, GithubData, Issue, PrInfo, Stats} from "../data-collection/types";
 import {calculateDiscussions, calculateIssues, calculatePrs} from "./calculations";
-import {stopExtractionDate} from "../data-collection/GithubExtractor";
-import {Idbconnection} from "../dbms/interfaces/Idbconnection";
+import type {Idbconnection} from "../dbms/interfaces/Idbconnection";
 import {StatsTable} from "../dbms/tables/StatsTable";
 
 function get7daysAgo(oldDate: Date) {

@@ -1,7 +1,7 @@
-import {Label, PrInfo, Review} from "../../data-collection/types";
+import type { PrInfo, Review} from "../../data-collection/types";
 import {AbstractDbTable} from "./AbstractDbTable";
 import {isEqual} from "../util";
-import {IGithubDB} from "../interfaces/IGithubDB";
+import type {IGithubDB} from "../interfaces/IGithubDB";
 
 export class PullRequestTable extends AbstractDbTable implements IGithubDB {
 
@@ -13,7 +13,7 @@ export class PullRequestTable extends AbstractDbTable implements IGithubDB {
             await this.insertRows(prs);
             return;
         }
-
+        // @ts-ignore
         const allNumbers = table.map(r => r.id);
         const pullRequestsToInsert = prs.filter(dis => !allNumbers.includes(dis.number));
         await this.insertRows(pullRequestsToInsert)
@@ -44,10 +44,12 @@ export class PullRequestTable extends AbstractDbTable implements IGithubDB {
 
     async updateRows(prs: PrInfo[], table: any) {
         let map = new Map<number, any>();
+        // @ts-ignore
         table.forEach(row => map[row.id] = row);
 
         for (const iss of prs) {
             const issRow = this.convertToObj(iss);
+            // @ts-ignore
             let row = map[iss.number];
             if (row && isEqual(row, issRow)) {
                 await this.updateRow(row.id, iss);
@@ -69,7 +71,7 @@ export class PullRequestTable extends AbstractDbTable implements IGithubDB {
             pr.lastCommentAuthor ?? '',
             pr.reviewsAndComments ? JSON.stringify(pr.reviewsAndComments) : '',
             pr.participants ? JSON.stringify(pr.participants) : '',
-            pr.lastCommitDate.toDateString(),
+            pr.lastCommitDate? pr.lastCommitDate.toDateString(): '',
             pr.state,
             pr.isDraft,
             pr.requiresReview
@@ -90,7 +92,7 @@ export class PullRequestTable extends AbstractDbTable implements IGithubDB {
             lastCommentAuthor: pr.lastCommentAuthor ?? '',
             reviewsAndComments: pr.reviewsAndComments ? JSON.stringify(pr.reviewsAndComments) : '',
             participants: pr.participants ? JSON.stringify(pr.participants) : '',
-            lastCommitDate: pr.lastCommitDate.toDateString(),
+            lastCommitDate: pr.lastCommitDate? pr.lastCommitDate.toDateString(): '',
             prState: pr.state,
             isDraft: pr.isDraft,
             requiresReview: pr.requiresReview,
@@ -101,6 +103,7 @@ export class PullRequestTable extends AbstractDbTable implements IGithubDB {
         const table = await this.selectTable('pull_requests');
 
         let res: PrInfo[] = [];
+        // @ts-ignore
         table.forEach(row => {
             const pr: PrInfo = {
                 number: row.id,

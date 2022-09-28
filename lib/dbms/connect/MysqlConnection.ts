@@ -1,4 +1,4 @@
-import {Idbconnection} from "../interfaces/Idbconnection";
+import type {Idbconnection} from "../interfaces/Idbconnection";
 
 export class MysqlConnection implements Idbconnection {
     private conn: any;
@@ -12,7 +12,7 @@ export class MysqlConnection implements Idbconnection {
             database: 'sql8511743',
             port: 3306
         });
-        await connection.connect(function (err) {
+        await connection.connect(function (err: any) {
             if (err) throw err;
             console.log("Connected to DB!");
         });

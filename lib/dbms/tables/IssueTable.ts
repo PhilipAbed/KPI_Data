@@ -1,7 +1,7 @@
-import {Comment, Issue, Label} from "../../data-collection/types";
+import type {Issue, Label} from "../../data-collection/types";
 import {AbstractDbTable} from "./AbstractDbTable";
 import {isEqual} from "../util";
-import {IGithubDB} from "../interfaces/IGithubDB";
+import type {IGithubDB} from "../interfaces/IGithubDB";
 
 
 export class IssueTable extends AbstractDbTable implements IGithubDB  {
@@ -14,7 +14,7 @@ export class IssueTable extends AbstractDbTable implements IGithubDB  {
             await this.insertRows(issues);
             return;
         }
-
+        // @ts-ignore
         const allNumbers = table.map(r => r.id);
         const issuesToInsert = issues.filter(dis => !allNumbers.includes(dis.number));
         await this.insertRows(issuesToInsert)
@@ -47,9 +47,11 @@ export class IssueTable extends AbstractDbTable implements IGithubDB  {
 
     async updateRows(issues: Issue[], table: any) {
         let map = new Map<number, any>();
+        // @ts-ignore
         table.forEach(row => map[row.id] = row);
         for (const iss of issues) {
             const issRow = this.convertToObj(iss);
+            // @ts-ignore
             let row = map[iss.number];
             if (row && isEqual(row, issRow)) {
                 await this.updateRow(row.id, iss);
@@ -94,6 +96,7 @@ export class IssueTable extends AbstractDbTable implements IGithubDB  {
         const table = await this.selectTable('issues');
 
         let res :Issue[] = [];
+        // @ts-ignore
         table.forEach(row => {
             const issue: Issue = {
                 number: row.id,

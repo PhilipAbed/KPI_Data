@@ -4,10 +4,8 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script type="text/javascript" src="./chart.min.js"></script>
-    <script type="text/javascript" src="./jquery.min.js"> </script>
-    <script type="text/javascript" src="./barchart.js"></script>
-    <script type="text/javascript" src="./json-data.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" id="mydata"></script>
     <title>Renovate KPI</title>
 </head>
 <body>
@@ -57,6 +55,50 @@
     </div>
 </div>
 <script>
+
+    const chartIdToStats = new Map([
+        ["Pull Requests Average Time Response", "prAvg"],
+        ["Issues Average Time Response", "issueAvg"],
+        ["Discussions Average Time Response", "discAvg"],
+        ["Pull Requests Opened By Community", "communityPrs"],
+        ["Issues Opened By Community", "communityIssues"],
+        ["Discussions Opened By Community", "communityDiscs"],
+        ["Pull Requests Opened By Maintainers", "mainPrs"],
+        ["Issues Opened By Maintainers", "mainIssues"],
+        ["Discussions Opened By Maintainers", "mainDiscs"],
+    ]);
+    async function start(data) {
+        const charts = document.getElementsByClassName("barchart");
+        for (const chart of charts) {
+            const ctx = chart.getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.dates,
+                    datasets: [{
+                        label: chart.id,
+                        backgroundColor: [
+                            "#07A5FF",
+                        ],
+                        data: getData(chart, data),
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+    }
+    function getData(chart, data) {
+        for (const [key, val] of Object.entries(data)) {
+            console.log(chartIdToStats);
+            console.log(key);
+            if (chartIdToStats.has(chart.id) && chartIdToStats.get(chart.id) === key) {
+                return val;
+            }
+        }
+    }
     start(data);
 </script>
 </body>

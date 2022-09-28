@@ -6,9 +6,17 @@
   "author": "PhilipAbed",
   "license": "MIT",
   "scripts": {
-    "build": "run-s clean generate:* compile:*",
+    "build": "npm-run-all -s clean compile:*",
+    "wp": "webpack",
+    "generate": "npm-run-all -s generate:*",
+    "compile:ts": "tsc -p tsconfig.app.json",
     "start": "node -r ts-node/register/transpile-only -- lib/app.ts",
-    "debug": "node --inspect-brk -r ts-node/register/transpile-only  -- lib/app.ts"
+    "clean": "rimraf dist tmp",
+    "ed": "yarn start lib/app.ts -ed",
+    "ei": "yarn start lib/app.ts -ei",
+    "ep": "yarn start lib/app.ts -ep",
+    "update": "yarn start lib/app.ts -u",
+    "chart": "yarn start lib/app.ts -d"
   },
   "dependencies": {
     "@octokit/graphql": "^5.0.0",
@@ -22,6 +30,8 @@
   },
   "devDependencies": {
     "@types/node": "^18.0.6",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2",
     "typescript": "^4.7.4"
   }
 }

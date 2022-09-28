@@ -1,11 +1,11 @@
 import {Discussions} from "./data-collection/Discussions";
-import {GithubExtractor, stopExtractionDate} from "./data-collection/GithubExtractor";
-import {Discussion, Issue, PrInfo, Stats} from "./data-collection/types";
+import type {GithubExtractor} from "./data-collection/GithubExtractor";
+import type {Discussion, Issue, PrInfo, Stats} from "./data-collection/types";
 import {DiscussionTable} from "./dbms/tables/DiscussionTable";
 import {calculateDiscussions, calculateIssues, calculatePrs} from "./logistics/calculations";
 import {Issues} from "./data-collection/Issues";
 import {PullRequests} from "./data-collection/PullRequests";
-import {Idbconnection} from "./dbms/interfaces/Idbconnection";
+import type {Idbconnection} from "./dbms/interfaces/Idbconnection";
 import {SqlLite} from "./dbms/connect/SqlLite";
 import {MysqlConnection} from "./dbms/connect/MysqlConnection";
 import {PullRequestTable} from "./dbms/tables/PullRequestTable";
@@ -16,7 +16,7 @@ import {prepareData} from "./logistics/chart/ChartData";
 
 main();
 
-function createInstance<T extends GithubExtractor>(constructor: new (token) => T, token): T {
+function createInstance<T extends GithubExtractor>(constructor: new (token: string) => T, token: string): T {
     return new constructor(token);
 }
 
@@ -45,8 +45,9 @@ export async function main() {
     } else {
         dbconn = new MysqlConnection();
     }
-    try {
 
+    try {
+        console.log("connecting to db");
         await dbconn.connectToDB();
 
         const listOfPaidAuthors = [
@@ -64,44 +65,64 @@ export async function main() {
             'viceice'];
 
         if (process.argv.includes("-ed")) {
+            console.log("extract discussions - start");
             const discussions = await createInstance(Discussions, token).getApiData() as Discussion[];
             const stats: Stats = {};
             const relevantDiscussions = calculateDiscussions(discussions, listOfPaidAuthors, stats);
             const discTable = new DiscussionTable(dbconn);
             await discTable.update(relevantDiscussions);
+            console.log("extract discussions - end");
         }
         if (process.argv.includes("-ei")) {
+            console.log("extract issues - start");
             const issues = await createInstance(Issues, token).getApiData() as Issue[];
             const stats: Stats = {};
             const relevantIssues = calculateIssues(issues, listOfPaidAuthors, stats);
             const issueTable = new IssueTable(dbconn);
             await issueTable.update(relevantIssues);
+            console.log("extract issues - end");
         }
         if (process.argv.includes("-ep")) {
+            console.log("extract pull requests - start");
             const pullRequests = await createInstance(PullRequests, token).getApiData() as PrInfo[];
             const stats: Stats = {};
             const relevantPrs = calculatePrs(pullRequests, listOfPaidAuthors, stats);
             const prTable = new PullRequestTable(dbconn);
             await prTable.update(relevantPrs);
+            console.log("extract pull requests - end");
         }
 
         if (process.argv.includes("-u")) {
+            console.log("update stats 7 days ago - start");
             const discTable = new DiscussionTable(dbconn);
             const issueTable = new IssueTable(dbconn);
             const prTable = new PullRequestTable(dbconn);
             const discussions = await discTable.extractTableToObj();
             const issues = await issueTable.extractTableToObj();
             const pullRequests = await prTable.extractTableToObj();
-
-            await updateHistoryStats(discussions, issues, pullRequests, listOfPaidAuthors, dbconn, stopExtractionDate);
+            const weekAgo: Date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+            await updateHistoryStats(discussions, issues, pullRequests, listOfPaidAuthors, dbconn, weekAgo);
+            console.log("update stats 7 days ago - end");
             return;
         }
 
-        if (process.argv.includes("-d")) {
-            const statsTable = new StatsTable(dbconn);
-            const stats: Stats[] = await statsTable.extractTableToObj();
-            await prepareData(stats)
-            return;
+        for (const arg of process.argv) {
+            if (arg.startsWith("-d=")) {
+                console.log("create data chart - start");
+                let weeks: number = 0;
+                weeks = Number(arg.replace('-d=', ' '));
+
+                if(!weeks) {
+                    console.log(`create data chart - weeks: ${weeks}`);
+                    break;
+                }
+
+                const statsTable = new StatsTable(dbconn);
+                const stats: Stats[] = await statsTable.extractTableToObj(weeks);
+                await prepareData(stats)
+                console.log("create data chart - end");
+                break;
+            }
         }
     } catch (err) {
         console.log(err);

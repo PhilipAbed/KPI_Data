@@ -1,15 +1,15 @@
-import {Discussion, Issue, PrInfo, Stats} from "../data-collection/types";
+import type {Discussion, Issue, PrInfo, Stats} from "../data-collection/types";
 import {stopExtractionDate} from "../data-collection/GithubExtractor";
 import {firstAndLastComments} from "./util";
 
 
 export function calculatePrs(prs: PrInfo[], listOfPaidAuthors: string[], stats: Stats) {
-    let pendingPrs = [];
-    let prsOpenedByMaintainers = [];
-    let prsOpenedByOssContributors = [];
-    let waitingHoursArrPR = [];
-    let ossPrAuthors = [];
-    let openNonDraftPrs = [];
+    let pendingPrs: number[] = [];
+    let prsOpenedByMaintainers: number[] = [];
+    let prsOpenedByOssContributors: number[] = [];
+    let waitingHoursArrPR: number[] = [];
+    // let ossPrAuthors: string[] = [];
+    let openNonDraftPrs: number[] = [];
 
     let relevantPRs: PrInfo[] = [];
     prs.forEach(pr => {
@@ -33,10 +33,10 @@ export function calculatePrs(prs: PrInfo[], listOfPaidAuthors: string[], stats: 
         }
 
         if (listOfPaidAuthors.includes(pr.author)) {
-            prsOpenedByMaintainers.push(pr.title)
+            prsOpenedByMaintainers.push(pr.number)
         } else {
-            prsOpenedByOssContributors.push(pr.title);
-            ossPrAuthors.push(pr.author)
+            prsOpenedByOssContributors.push(pr.number);
+            // ossPrAuthors.push(pr.author)
             if (waitingTimeInHours != null) {
                 waitingHoursArrPR.push(waitingTimeInHours);
             } else {
@@ -52,7 +52,7 @@ export function calculatePrs(prs: PrInfo[], listOfPaidAuthors: string[], stats: 
         sumWaitingTimePrs += number;
     }
 
-    stats.prAverageTimeResponse = (sumWaitingTimePrs/ 24) / waitingHoursArrPR.length;
+    stats.prAverageTimeResponse = (sumWaitingTimePrs / 24) / waitingHoursArrPR.length;
     stats.numberOfOpenedPrsByMaintainers = prsOpenedByMaintainers.length;
     stats.numberOfOpenedPrsByCommunity = prsOpenedByOssContributors.length;
     stats.pendingNewPrs = JSON.stringify(pendingPrs);
@@ -61,12 +61,11 @@ export function calculatePrs(prs: PrInfo[], listOfPaidAuthors: string[], stats: 
 }
 
 export function calculateIssues(issues: Issue[], listOfPaidAuthors: string[], stats: Stats) {
-    let pendingIssues = [];
-
-    let issuesOpenedByMaintainers = [];
-    let issuesOpenedByOssContributors = [];
-    let waitingHoursArrIssues = [];
-    let ossIssueAuthors = [];
+    let pendingIssues: number[] = [];
+    let issuesOpenedByMaintainers: number[] = [];
+    let issuesOpenedByOssContributors: number[] = [];
+    let waitingHoursArrIssues: number[] = [];
+    // let ossIssueAuthors: number[] = [];
 
     let relevantIssues: Issue[] = [];
     issues.forEach(is => {
@@ -83,30 +82,36 @@ export function calculateIssues(issues: Issue[], listOfPaidAuthors: string[], st
         if (is.comments) {
             waitingTimeInHours = firstAndLastComments(is, is.comments);
         }
-        if(is.labels) {
+        if (is.labels) {
             let lowestTime;
             for (const label of is.labels) {
-                if((label.name.startsWith('status') && !label.name.includes('requirements')) ||
-                    (label.name.startsWith('priority') && !label.name.includes('triage')) ||
-                    (!label.name.startsWith('priority') && !label.name.startsWith('status') && !label.name.startsWith('type'))
-                ){
+                if (label.name &&
+                    (
+                        (label.name.startsWith('status') && !label.name.includes('requirements')) ||
+                        (label.name.startsWith('priority') && !label.name.includes('triage')) ||
+                        (!label.name.startsWith('priority') && !label.name.startsWith('status') && !label.name.startsWith('type'))
+                    )
+                ) {
+                    if(!label.updatedAt){
+                        continue;
+                    }
                     const hours = Math.abs(label.updatedAt.getTime() - is.createdAt.getTime()) / 3600000;
-                    if(!lowestTime || hours < lowestTime) {
+                    if (!lowestTime || hours < lowestTime) {
                         lowestTime = hours;
                     }
                 }
             }
-            if(!waitingTimeInHours || lowestTime < waitingTimeInHours) {
+            if (!waitingTimeInHours || (lowestTime && lowestTime < waitingTimeInHours)) {
                 waitingTimeInHours = lowestTime;
             }
         }
 
 
         if (listOfPaidAuthors.includes(is.author)) {
-            issuesOpenedByMaintainers.push(is.title)
+            issuesOpenedByMaintainers.push(is.number)
         } else {
-            issuesOpenedByOssContributors.push(is.title);
-            ossIssueAuthors.push(is.author)
+            issuesOpenedByOssContributors.push(is.number);
+            // ossIssueAuthors.push(is.author)
             if (waitingTimeInHours != null) {
                 waitingHoursArrIssues.push(waitingTimeInHours);
             } else {
@@ -121,7 +126,7 @@ export function calculateIssues(issues: Issue[], listOfPaidAuthors: string[], st
     for (const number of waitingHoursArrIssues) {
         sumWaitingTimeIssues += number;
     }
-    stats.issuesAverageTimeResponse = (sumWaitingTimeIssues/ 24)  / waitingHoursArrIssues.length;
+    stats.issuesAverageTimeResponse = (sumWaitingTimeIssues / 24) / waitingHoursArrIssues.length;
     stats.numberOfGithubIssuesByCommunity = issuesOpenedByOssContributors.length;
     stats.numberOfGithubIssuesByMaintainers = issuesOpenedByMaintainers.length;
     stats.pendingIssues = JSON.stringify(pendingIssues);
@@ -129,12 +134,12 @@ export function calculateIssues(issues: Issue[], listOfPaidAuthors: string[], st
 }
 
 export function calculateDiscussions(discussions: Discussion[], listOfPaidAuthors: string[], stats: Stats) {
-    let pendingDiscussions = [];
+    let pendingDiscussions: number[] = [];
 
-    let discussionsOpenedByMaintainers = [];
-    let discussionsOpenedByOssContributors = [];
-    let waitingHoursArrDiscussions = [];
-    let ossDiscussionsAuthors = [];
+    let discussionsOpenedByMaintainers: number[] = [];
+    let discussionsOpenedByOssContributors: number[] = [];
+    let waitingHoursArrDiscussions: number[] = [];
+    // let ossDiscussionsAuthors = [];
 
     let relevantDiscussions: Discussion[] = [];
     discussions.forEach(dis => {
@@ -153,10 +158,10 @@ export function calculateDiscussions(discussions: Discussion[], listOfPaidAuthor
         }
 
         if (listOfPaidAuthors.includes(dis.author)) {
-            discussionsOpenedByMaintainers.push(dis.title)
+            discussionsOpenedByMaintainers.push(dis.number)
         } else {
-            discussionsOpenedByOssContributors.push(dis.title);
-            ossDiscussionsAuthors.push(dis.author)
+            discussionsOpenedByOssContributors.push(dis.number);
+            // ossDiscussionsAuthors.push(dis.author)
             // only community PRs are relevant for response times
             if (waitingTimeInHours != null) {
                 waitingHoursArrDiscussions.push(waitingTimeInHours);
@@ -171,7 +176,7 @@ export function calculateDiscussions(discussions: Discussion[], listOfPaidAuthor
         sumWaitingTimeDiscussions += number;
     }
 
-    stats.discussionsAverageTimeResponse = (sumWaitingTimeDiscussions/ 24)  / waitingHoursArrDiscussions.length;
+    stats.discussionsAverageTimeResponse = (sumWaitingTimeDiscussions / 24) / waitingHoursArrDiscussions.length;
     stats.numberOfGithubDiscussionsByCommunity = discussionsOpenedByOssContributors.length;
     stats.numberOfGithubDiscussionsByMaintainers = discussionsOpenedByMaintainers.length;
     stats.pendingDiscussions = JSON.stringify(pendingDiscussions);

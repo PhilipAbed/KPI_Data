@@ -6,7 +6,11 @@
     "sourceMap": true,
     "inlineSources": true,
     "importHelpers": true,
-    "types": ["node"]
+    "types": ["node"],
+    "lib": [
+      "dom"
+    ]
   },
   "files": ["lib/app.ts",],
+  "exclude": ["lib/logistics/chart/json-data.js"]
 }

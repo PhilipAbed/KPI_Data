@@ -36,11 +36,14 @@ export class StatsTable extends AbstractDbTable {
         ];
     }
 
-    public async extractTableToObj(): Promise<Stats[]> {
-        const table = await this.selectTable('stats');
+    public async extractTableToObj(weeks: number): Promise<Stats[]> {
+        let table = await this.selectTable('stats');
         if (!table) {
             return [];
         }
+        const filterDatesUntil = new Date(Date.now() - weeks * 7 * 24 * 60 * 60 * 1000);
+        // @ts-ignore
+        table = table.filter(row => new Date(row.statsDate) >= filterDatesUntil);
         let res :Stats[] = [];
         // @ts-ignore
         table.forEach(row => {

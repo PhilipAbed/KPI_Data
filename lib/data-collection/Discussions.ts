@@ -1,4 +1,4 @@
-import {Comment, Discussion, GithubData} from "./types";
+import type {Comment, Discussion, GithubData} from "./types";
 import {GithubExtractor, stopExtractionDate} from "./GithubExtractor";
 
 export class Discussions extends GithubExtractor {

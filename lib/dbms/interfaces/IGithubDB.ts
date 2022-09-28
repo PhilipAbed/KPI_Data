@@ -1,15 +1,15 @@
-import {GithubData} from "../../data-collection/types";
+import type {GithubData} from "../../data-collection/types";
 
 export interface IGithubDB {
-    insertRows(data: GithubData[]);
+    insertRows(data: GithubData[]): void;
 
-    updateRows(data: GithubData[], table: any)
+    updateRows(data: GithubData[], table: any): void;
 
-    updateRow(id: number, data: GithubData);
+    updateRow(id: number, data: GithubData): void;
 
     convertToObj(data: GithubData): any;
 
-    update(data: GithubData[]);
+    update(data: GithubData[]): void;
 
     extractTableToObj(): Promise<GithubData[]>;
 

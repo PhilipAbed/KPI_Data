@@ -1,9 +1,8 @@
 import {graphql} from "@octokit/graphql";
-import {Repository} from "github-graphql-schema";
-import {GithubData} from "./types";
+import type {Repository} from "github-graphql-schema";
+import type {GithubData} from "./types";
 
-//7 days ago
-export const stopExtractionDate: Date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+export const stopExtractionDate: Date = new Date(Date.now() - 24 * 60 * 60 * 1000);
 // export const stopExtractionDate: Date = new Date('2022-02-01');
 
 export abstract class GithubExtractor {
@@ -15,6 +14,7 @@ export abstract class GithubExtractor {
 
     protected abstract getNextQuery(data: any): string;
 
+    // @ts-ignore
     protected abstract aggregateData(data: any, nextData: any);
 
     private readonly token: string;

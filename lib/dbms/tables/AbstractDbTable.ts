@@ -1,5 +1,5 @@
-import {Idbconnection} from "../interfaces/Idbconnection";
-import {Comment} from "../../data-collection/types";
+import type {Idbconnection} from "../interfaces/Idbconnection";
+import type {Comment} from "../../data-collection/types";
 
 
 export abstract class AbstractDbTable {
