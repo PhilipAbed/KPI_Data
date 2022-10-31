@@ -37,13 +37,20 @@ function extractToken() {
 export async function main() {
     let token = extractToken();
     if (!token) {
+        console.log("need github token in environment variable: GITHUB_COM_TOKEN=YourGithubToken");
         return;
     }
     let dbconn: Idbconnection;
     if (process.env.KPI_SQLITE_DB_FILE) {
+        console.log("sql lite DB ");
         dbconn = new SqlLite();
     } else {
+        console.log("sql connection  ");
         dbconn = new MysqlConnection();
+    }
+    if(!dbconn){
+        console.log("set DB connection with environment variable: KPI_SQLITE_DB_FILE=YOUR FILE");
+        return;
     }
 
     try {
@@ -64,7 +71,7 @@ export async function main() {
             'HonkingGoose',
             'viceice'];
 
-        if (process.argv.includes("-ed")) {
+        if (process.argv.includes("extractd")) {
             console.log("extract discussions - start");
             const discussions = await createInstance(Discussions, token).getApiData() as Discussion[];
             const stats: Stats = {};
@@ -73,7 +80,7 @@ export async function main() {
             await discTable.update(relevantDiscussions);
             console.log("extract discussions - end");
         }
-        if (process.argv.includes("-ei")) {
+        if (process.argv.includes("extracti")) {
             console.log("extract issues - start");
             const issues = await createInstance(Issues, token).getApiData() as Issue[];
             const stats: Stats = {};
@@ -82,7 +89,7 @@ export async function main() {
             await issueTable.update(relevantIssues);
             console.log("extract issues - end");
         }
-        if (process.argv.includes("-ep")) {
+        if (process.argv.includes("extractp")) {
             console.log("extract pull requests - start");
             const pullRequests = await createInstance(PullRequests, token).getApiData() as PrInfo[];
             const stats: Stats = {};
@@ -92,25 +99,33 @@ export async function main() {
             console.log("extract pull requests - end");
         }
 
-        if (process.argv.includes("-u")) {
-            console.log("update stats 7 days ago - start");
-            const discTable = new DiscussionTable(dbconn);
-            const issueTable = new IssueTable(dbconn);
-            const prTable = new PullRequestTable(dbconn);
-            const discussions = await discTable.extractTableToObj();
-            const issues = await issueTable.extractTableToObj();
-            const pullRequests = await prTable.extractTableToObj();
-            const weekAgo: Date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-            await updateHistoryStats(discussions, issues, pullRequests, listOfPaidAuthors, dbconn, weekAgo);
-            console.log("update stats 7 days ago - end");
-            return;
-        }
-
         for (const arg of process.argv) {
-            if (arg.startsWith("-d=")) {
+            if(arg.startsWith("sync=")){
+                let weeks: number = 0;
+                weeks = Number(arg.replace('sync=', ''));
+
+                if(!weeks) {
+                    console.log(`update stats table fail - weeks: ${weeks}`);
+                    break;
+                }
+
+                console.log("update stats from " + weeks + " weeks ago - start");
+                const discTable = new DiscussionTable(dbconn);
+                const issueTable = new IssueTable(dbconn);
+                const prTable = new PullRequestTable(dbconn);
+                const discussions = await discTable.extractTableToObj();
+                const issues = await issueTable.extractTableToObj();
+                const pullRequests = await prTable.extractTableToObj();
+                const weeksAgo: Date = new Date(Date.now() - weeks * 24 * 60 * 60 * 1000);
+                await updateHistoryStats(discussions, issues, pullRequests, listOfPaidAuthors, dbconn, weeksAgo);
+                console.log("update stats 7 days ago - end");
+                break;
+            }
+
+            if (arg.startsWith("export=")) {
                 console.log("create data chart - start");
                 let weeks: number = 0;
-                weeks = Number(arg.replace('-d=', ' '));
+                weeks = Number(arg.replace('export=', ' '));
 
                 if(!weeks) {
                     console.log(`create data chart - weeks: ${weeks}`);

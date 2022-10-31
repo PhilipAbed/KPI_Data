@@ -20,7 +20,9 @@ export class MysqlConnection implements Idbconnection {
     }
 
     async close() {
-        await this.conn.end();
+        if(this.conn){
+            await this.conn.end();
+        }
     }
 
     async exec(query: string): Promise<any> {

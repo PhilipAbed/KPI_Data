@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" id="mydata">var data = {"dates":["6/13/2022","6/20/2022","6/27/2022","7/4/2022","7/11/2022","7/18/2022","7/25/2022","8/1/2022","8/8/2022","8/15/2022","8/22/2022","8/29/2022","9/5/2022","9/12/2022"],"prAvg":[0.6062585872162485,0.5881700450450449,1.126075498575499,0.656795267489712,0.6642563657407405,0.556496074879227,0.6484030047204068,2.792326388888889,0.8317842229484387,0.7560023148148147,0.9131697322322324,0.677150639090177,1.2402164001122342,0.6232799796747966],"issueAvg":[5.147766754850089,10.08959444444444,9.074422582304528,1.1188164251207728,5.849492102396513,22.182468932748534,5.499351325757576,0.77252365136876,1.5538732890499194,3.9965162037037034,22.822406442901233,45.14495531121399,35.848031599913874,22.467742504409173],"discAvg":[1.0219483609240552,0.8907675748997409,2.597371198606864,0.6947665644540645,1.824791087962964,9.193220348324516,1.5182335648148146,0.8299410377358492,0.8282529825498574,0.9000147306397306,0.8140900997150996,1.0516852288609368,0.8972052304964538,0.9585530445699936],"communityPrs":[31,37,26,27,32,47,53,46,51,61,75,92,99,86],"communityIssues":[21,26,18,23,18,21,22,23,26,31,40,36,45,63],"communityDiscs":[215,169,113,83,62,45,51,56,53,58,54,55,48,67],"mainPrs":[20,14,37,22,18,9,21,49,11,22,50,50,69,62],"mainIssues":[7,11,15,11,8,10,15,12,10,23,19,39,29,22],"mainDiscs":[1,2,1,2,0,1,0,2,2,1,2,1,0,0],"prNeedRev":[],"prNew":[],"issuesNew":[],"discsNew":[]}</script>
+    <title>Renovate KPI</title>
+</head>
+<body>
+<div>
+    <div>
+        <canvas id="Pull Requests Average Time Response" class="barchart" width="500" height="500"></canvas>
+    </div>
+</div>
+<div>
+    <div>
+        <canvas id="Discussions Average Time Response" class="barchart" width="500" height="500"></canvas>
+    </div>
+</div>
+<div>
+    <div>
+        <canvas id="Issues Average Time Response" class="barchart" width="500" height="500"></canvas>
+    </div>
+</div>
+<div>
+    <div>
+        <canvas id="Pull Requests Opened By Community" class="barchart" width="500" height="500"></canvas>
+    </div>
+</div>
+<div>
+    <div>
+        <canvas id="Issues Opened By Community" class="barchart" width="500" height="500"></canvas>
+    </div>
+</div>
+<div>
+    <div>
+        <canvas id="Discussions Opened By Community" class="barchart" width="500" height="500"></canvas>
+    </div>
+</div>
+<div>
+    <div>
+        <canvas id="Pull Requests Opened By Maintainers" class="barchart" width="500" height="500"></canvas>
+    </div>
+</div>
+<div>
+    <div>
+        <canvas id="Issues Opened By Maintainers" class="barchart" width="500" height="500"></canvas>
+    </div>
+</div>
+<div>
+    <div>
+        <canvas id="Discussions Opened By Maintainers" class="barchart" width="500" height="500"></canvas>
+    </div>
+</div>
+<script>
+
+    const chartIdToStats = new Map([
+        ["Pull Requests Average Time Response", "prAvg"],
+        ["Issues Average Time Response", "issueAvg"],
+        ["Discussions Average Time Response", "discAvg"],
+        ["Pull Requests Opened By Community", "communityPrs"],
+        ["Issues Opened By Community", "communityIssues"],
+        ["Discussions Opened By Community", "communityDiscs"],
+        ["Pull Requests Opened By Maintainers", "mainPrs"],
+        ["Issues Opened By Maintainers", "mainIssues"],
+        ["Discussions Opened By Maintainers", "mainDiscs"],
+    ]);
+    async function start(data) {
+        const charts = document.getElementsByClassName("barchart");
+        for (const chart of charts) {
+            const ctx = chart.getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.dates,
+                    datasets: [{
+                        label: chart.id,
+                        backgroundColor: [
+                            "#07A5FF",
+                        ],
+                        data: getData(chart, data),
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+    }
+    function getData(chart, data) {
+        for (const [key, val] of Object.entries(data)) {
+            console.log(chartIdToStats);
+            console.log(key);
+            if (chartIdToStats.has(chart.id) && chartIdToStats.get(chart.id) === key) {
+                return val;
+            }
+        }
+    }
+    start(data);
+</script>
+</body>
+</html>

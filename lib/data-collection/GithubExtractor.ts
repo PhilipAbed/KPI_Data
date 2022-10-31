@@ -2,7 +2,7 @@ import {graphql} from "@octokit/graphql";
 import type {Repository} from "github-graphql-schema";
 import type {GithubData} from "./types";
 
-export const stopExtractionDate: Date = new Date(Date.now() - 24 * 60 * 60 * 1000);
+export const stopExtractionDate: Date = new Date(Date.now() - 1.1 * 24 * 60 * 60 * 1000);
 // export const stopExtractionDate: Date = new Date('2022-02-01');
 
 export abstract class GithubExtractor {
