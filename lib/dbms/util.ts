@@ -1,1 +1,0 @@
-export const isEqual = require('lodash/isEqual');
