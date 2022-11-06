@@ -60,8 +60,6 @@ export async function main() {
         const listOfPaidAuthors = [
             'PhilipAbed',
             'StinkyLord',
-            'hasanawad94',
-            'hasanwhitesource',
             'JamieMagee',
             'MaronHatoum',
             'Gabriel-Ladzaretti',
