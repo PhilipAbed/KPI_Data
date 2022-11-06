@@ -4,6 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-attrs = "==18.0.0"
+attrs = "==18.2.0"
 
 [dev-packages]
